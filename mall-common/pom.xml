@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <!--  父工程  -->
+    <parent>
+        <artifactId>mall-dev</artifactId>
+        <groupId>org.icoding</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <!--  子工程的打包方式默认为jar, 即子工程以jar包的形式存在于父工程中  -->
+    <packaging>jar</packaging>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>mall-common</artifactId>
+
+
+</project>
