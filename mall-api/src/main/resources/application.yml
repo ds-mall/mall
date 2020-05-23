@@ -44,4 +44,13 @@ mybatis:
   type-aliases-package: com.icoding.pojo    # 所有POJO类所在包路径
   mapper-locations: classpath:mapper/*.xml  # mapper映射文件
 
-
+#############################################################
+#
+# mybatis mapper 配置
+#
+#############################################################
+# 通用mapper配置
+mapper:
+  mappers: com.icoding.my.mapper.MyMapper
+  not-empty: false  # 在进行数据库操作的时候，判断表达式 username != null, 在sql后追加 username != ''
+  identity: MYSQL
