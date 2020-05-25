@@ -5,4 +5,5 @@ import com.icoding.pojo.Users;
 import org.apache.ibatis.annotations.Mapper;
 
 public interface UsersMapper extends MyMapper<Users> {
+  Users getUserByUsername(String username);
 }
