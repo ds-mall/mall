@@ -11,6 +11,7 @@
 
     <!--  子工程的打包方式默认为jar, 即子工程以jar包的形式存在于父工程中  -->
     <packaging>jar</packaging>
+
     <modelVersion>4.0.0</modelVersion>
     <artifactId>mall-common</artifactId>
 

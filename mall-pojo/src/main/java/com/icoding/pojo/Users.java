@@ -282,4 +282,103 @@ public class Users {
     public void setUpdatedTime(Date updatedTime) {
         this.updatedTime = updatedTime;
     }
+
+    public static final class UsersBuilder {
+        private String id;
+        private String username;
+        private String password;
+        private String nickname;
+        private String realname;
+        private String face;
+        private String mobile;
+        private String email;
+        private Integer sex;
+        private Date birthday;
+        private Date createdTime;
+        private Date updatedTime;
+
+        private UsersBuilder() {
+        }
+
+        public static UsersBuilder anUsers() {
+            return new UsersBuilder();
+        }
+
+        public UsersBuilder withId(String id) {
+            this.id = id;
+            return this;
+        }
+
+        public UsersBuilder withUsername(String username) {
+            this.username = username;
+            return this;
+        }
+
+        public UsersBuilder withPassword(String password) {
+            this.password = password;
+            return this;
+        }
+
+        public UsersBuilder withNickname(String nickname) {
+            this.nickname = nickname;
+            return this;
+        }
+
+        public UsersBuilder withRealname(String realname) {
+            this.realname = realname;
+            return this;
+        }
+
+        public UsersBuilder withFace(String face) {
+            this.face = face;
+            return this;
+        }
+
+        public UsersBuilder withMobile(String mobile) {
+            this.mobile = mobile;
+            return this;
+        }
+
+        public UsersBuilder withEmail(String email) {
+            this.email = email;
+            return this;
+        }
+
+        public UsersBuilder withSex(Integer sex) {
+            this.sex = sex;
+            return this;
+        }
+
+        public UsersBuilder withBirthday(Date birthday) {
+            this.birthday = birthday;
+            return this;
+        }
+
+        public UsersBuilder withCreatedTime(Date createdTime) {
+            this.createdTime = createdTime;
+            return this;
+        }
+
+        public UsersBuilder withUpdatedTime(Date updatedTime) {
+            this.updatedTime = updatedTime;
+            return this;
+        }
+
+        public Users build() {
+            Users users = new Users();
+            users.setId(id);
+            users.setUsername(username);
+            users.setPassword(password);
+            users.setNickname(nickname);
+            users.setRealname(realname);
+            users.setFace(face);
+            users.setMobile(mobile);
+            users.setEmail(email);
+            users.setSex(sex);
+            users.setBirthday(birthday);
+            users.setCreatedTime(createdTime);
+            users.setUpdatedTime(updatedTime);
+            return users;
+        }
+    }
 }
