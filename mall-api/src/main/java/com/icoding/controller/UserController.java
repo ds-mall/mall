@@ -4,10 +4,14 @@ import com.icoding.bo.UserBO;
 import com.icoding.pojo.Users;
 import com.icoding.service.UsersService;
 import com.icoding.utils.JSONResult;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
+@Api(value = "注册登录", tags = {"用于注册登录的相关接口"})
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -15,11 +19,13 @@ public class UserController {
   @Autowired
   private UsersService usersService;
 
+  @ApiIgnore
   @GetMapping("/{id}")
   public Users getUserById(@PathVariable("id") int id) {
     return usersService.getUsersById(id);
   }
 
+  @ApiOperation(value = "用户名是否存在", notes = "用户名是否存在", httpMethod = "GET")
   @GetMapping("usernameIsExist")
   public JSONResult usernameIsExist(@RequestParam String username) {
     // 1 用户名是否为空
@@ -37,6 +43,7 @@ public class UserController {
     return JSONResult.ok(current);
   }
 
+  @ApiOperation(value = "用户注册", notes = "用户注册", httpMethod = "POST")
   @PostMapping("/regist")
   public JSONResult regist(@RequestBody UserBO userBO) {
     String username = userBO.getUsername();

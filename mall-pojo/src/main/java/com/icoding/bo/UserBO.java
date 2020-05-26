@@ -1,7 +1,9 @@
 package com.icoding.bo;
 
 import com.icoding.pojo.Users;
+import io.swagger.annotations.ApiModel;
 
+@ApiModel(value = "用户对象BO", description = "用户输入的数据封装在次entity中")
 public class UserBO {
   // 用户名
   private String username;
