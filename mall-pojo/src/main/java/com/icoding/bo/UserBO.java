@@ -2,14 +2,15 @@ package com.icoding.bo;
 
 import com.icoding.pojo.Users;
 import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel(value = "用户对象BO", description = "用户输入的数据封装在次entity中")
 public class UserBO {
-  // 用户名
+  @ApiModelProperty(value = "用户名", name = "用户名", example = "icoding", required = true)
   private String username;
-  // 密码
+  @ApiModelProperty(value = "密码", name = "密码", example = "1234567", required = true)
   private String password;
-  // 确认密码
+  @ApiModelProperty(value = "确认密码", name = "确认密码", example = "1234567", required = true)
   private String confirmPassword;
 
   public String getUsername() {
