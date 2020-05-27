@@ -119,4 +119,15 @@ public class UserController {
     // 5 返回登录信息
     return JSONResult.ok(user);
   }
+
+  @ApiOperation(value = "用户退出登录", notes = "用户退出登录", httpMethod = "GET")
+  @GetMapping("/logout")
+  public JSONResult logout(@RequestParam String userId, HttpServletRequest req, HttpServletResponse rep) {
+    // 删除cookie
+    CookieUtils.deleteCookie(req, rep, "user");
+
+    // TODO 用户退出登录，清空购物车
+    // TODO 分布式会话中需要清除用户数据
+    return JSONResult.ok();
+  }
 }
