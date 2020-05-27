@@ -283,6 +283,20 @@ public class Users {
         this.updatedTime = updatedTime;
     }
 
+    /**
+     * 屏蔽隐私信息
+     * @param user
+     * @return
+     */
+    public static void setNullProperty(Users user) {
+        user.setRealname(null);
+        user.setPassword(null);
+        user.setBirthday(null);
+        user.setEmail(null);
+        user.setCreatedTime(null);
+        user.setUpdatedTime(null);
+    }
+
     public static final class UsersBuilder {
         private String id;
         private String username;

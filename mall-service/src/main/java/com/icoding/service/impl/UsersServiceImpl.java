@@ -66,4 +66,17 @@ public class UsersServiceImpl implements UsersService {
     usersMapper.insert(user);
     return user;
   }
+
+
+  /**
+   * 根据用户名和密码匹配用户，用于登录
+   * @param username
+   * @param password
+   * @return
+   */
+  @Transactional(propagation = Propagation.SUPPORTS)
+  @Override
+  public Users queryUserForLogin(String username, String password) {
+    return usersMapper.queryUserForLogin(username, password);
+  }
 }

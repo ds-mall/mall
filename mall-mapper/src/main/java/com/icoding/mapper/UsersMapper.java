@@ -7,4 +7,5 @@ import org.apache.ibatis.annotations.Mapper;
 
 public interface UsersMapper extends MyMapper<Users> {
   Users getUserByUsername(String username);
+  Users queryUserForLogin(String username, String password);
 }

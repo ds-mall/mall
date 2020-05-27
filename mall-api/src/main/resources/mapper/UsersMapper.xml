@@ -1,25 +1,40 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.icoding.mapper.UsersMapper" >
-  <resultMap id="BaseResultMap" type="com.icoding.pojo.Users" >
-    <!--
-      WARNING - @mbg.generated
-    -->
-    <id column="id" property="id" jdbcType="VARCHAR" />
-    <result column="username" property="username" jdbcType="VARCHAR" />
-    <result column="password" property="password" jdbcType="VARCHAR" />
-    <result column="nickname" property="nickname" jdbcType="VARCHAR" />
-    <result column="realname" property="realname" jdbcType="VARCHAR" />
-    <result column="face" property="face" jdbcType="VARCHAR" />
-    <result column="mobile" property="mobile" jdbcType="VARCHAR" />
-    <result column="email" property="email" jdbcType="VARCHAR" />
-    <result column="sex" property="sex" jdbcType="INTEGER" />
-    <result column="birthday" property="birthday" jdbcType="DATE" />
-    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
-    <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
-  </resultMap>
+    <resultMap id="BaseResultMap" type="com.icoding.pojo.Users" >
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="username" property="username" jdbcType="VARCHAR" />
+        <result column="password" property="password" jdbcType="VARCHAR" />
+        <result column="nickname" property="nickname" jdbcType="VARCHAR" />
+        <result column="realname" property="realname" jdbcType="VARCHAR" />
+        <result column="face" property="face" jdbcType="VARCHAR" />
+        <result column="mobile" property="mobile" jdbcType="VARCHAR" />
+        <result column="email" property="email" jdbcType="VARCHAR" />
+        <result column="sex" property="sex" jdbcType="INTEGER" />
+        <result column="birthday" property="birthday" jdbcType="DATE" />
+        <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+        <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+    </resultMap>
 
-  <select id="getUserByUsername" resultMap="BaseResultMap">
+    <!--定义可重用的 SQL 代码片段，以便在其它语句中使用-->
+    <sql id="baseSql">
+        id,username, password, nickname,realname, face, mobile, email, sex, birthday, created_time, updated_time
+    </sql>
+
+    <select id="getUserByUsername" resultMap="BaseResultMap">
        select id, username from users where username = #{username}
+    </select>
+
+    <select id="queryUserForLogin" resultMap="BaseResultMap">
+        select
+        <include refid="baseSql"></include>
+        FROM users
+        WHERE
+        username = #{username}
+        AND
+        password = #{password}
     </select>
 </mapper>
