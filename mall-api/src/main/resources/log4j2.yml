@@ -1,0 +1,60 @@
+Configuration:
+  status: WARN # 用来指定log4j本身的打印日志的级别.
+  properties: # 定义全局变量
+    property:
+    -
+      name: filename
+      value: icoding
+    -
+      name: pathname
+      value: /Users/shengding/Projects/Github/Mall/log
+
+  # 常见的有三种子节点:Console、RollingFile、File
+  appenders:
+    # 用来定义输出到控制台的Appende
+    Console:
+      name: STDOUT
+      target: SYSTEM_OUT
+      PatternLayout:
+        Pattern: "%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n"
+
+#    File: # 用来定义输出到指定位置的文件的Appender.
+#      name: File
+#      fileName: ${pathname}/${filename}.log
+#      PatternLayout:
+#        Pattern: "%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n"
+#      Filters:
+#        ThresholdFilter:
+#          level: error
+
+    # 用来定义超过指定大小自动删除旧的创建新的的Appender
+    RollingFile:
+      - name: ROLLING_FILE # 指定Appender的名字
+        ignoreExceptions: false
+        fileName: ${pathname}/${filename}.log # 指定输出日志的目的文件带全路径的文件名
+        filePattern: "${pathname}/$${date:yyyy-MM}/${filename}-%d{yyyy-MM-dd}-%i.log.gz" # 指定新建日志文件的名称格式
+        PatternLayout:
+          pattern: "%d{yyyy-MM-dd HH:mm:ss,SSS}:%4p %t (%F:%L) - %m%n" # 输出格式，不设置默认为:%m%n
+        Policies: # 指定滚动日志的策略，就是什么时候进行新建日志文件输出日志
+          SizeBasedTriggeringPolicy: # 基于指定文件大小的滚动策略，size属性用来定义每个日志文件的大小.
+            size: "128 MB"
+          # TimeBasedTriggeringPolicy，基于时间的滚动策略
+        DefaultRolloverStrategy: # 指定同一个文件夹下最多有几个日志文件时开始删除最旧的，创建新的(通过max属性)
+          max: 1000
+
+  Loggers:
+    # 用来指定项目的根日志级别，如果没有单独指定Logger，那么就会默认使用该Root日志输出
+    Root:
+      level: INFO # 日志输出级别
+      AppenderRef: # 用来指定该日志输出到哪个Appender
+        - ref: STDOUT
+        - ref: ROLLING_FILE
+
+    # 用来单独指定日志的形式, 配置特殊的Log级别，方便调试
+    Logger:
+        name: org.n3r.idworker # 用来指定该Logger所适用的类或者类所在的包全路径,继承自Root节点
+        level: debug
+        additivity: false
+        AppenderRef:
+          ref: ROLLING_FILE
+

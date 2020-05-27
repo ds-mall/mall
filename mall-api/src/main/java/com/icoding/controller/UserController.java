@@ -10,6 +10,8 @@ import com.icoding.utils.MD5Utils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -21,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 @RequestMapping("/user")
 public class UserController {
+  private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
   @Autowired
   private UsersService usersService;
@@ -28,6 +31,10 @@ public class UserController {
   @ApiIgnore
   @GetMapping("/{id}")
   public Users getUserById(@PathVariable("id") int id) {
+    LOGGER.debug("hello world ====>");
+    LOGGER.info("hello world ====>");
+    LOGGER.warn("hello world ====>");
+    LOGGER.error("hello world ====>");
     return usersService.getUsersById(id);
   }
 
