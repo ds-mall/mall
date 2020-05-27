@@ -52,9 +52,9 @@ Configuration:
 
     # 用来单独指定日志的形式, 配置特殊的Log级别，方便调试
     Logger:
-        name: org.n3r.idworker # 用来指定该Logger所适用的类或者类所在的包全路径,继承自Root节点
+        name: com.icoding.mapper # 用来指定该Logger所适用的类或者类所在的包全路径,继承自Root节点, 例如打印mybatis sql语句
         level: debug
         additivity: false
         AppenderRef:
-          ref: ROLLING_FILE
+          ref: STDOUT
 
