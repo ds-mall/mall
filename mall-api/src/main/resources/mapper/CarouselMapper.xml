@@ -16,4 +16,16 @@
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
   </resultMap>
+
+  <sql id="baseSql">
+    id, image_url, background_color, item_id, cat_id, type, sort, is_show, create_time, update_time
+  </sql>
+
+  <!-- 首页轮播图列表 -->
+  <select id="queryAll" resultMap="BaseResultMap">
+    SELECT <include refid="baseSql" />
+    FROM carousel
+    WHERE is_show = #{isShow}
+    ORDER BY sort DESC
+  </select>
 </mapper>
