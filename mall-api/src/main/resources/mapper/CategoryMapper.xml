@@ -14,4 +14,51 @@
     <result column="cat_image" property="catImage" jdbcType="VARCHAR" />
     <result column="bg_color" property="bgColor" jdbcType="VARCHAR" />
   </resultMap>
+
+  <resultMap id="SubCategoryResultMap" type="com.icoding.vo.SecondLevelCategoryVO">
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="father_id" property="fatherId" jdbcType="INTEGER" />
+    <!--
+      参考链接: https://mybatis.org/mybatis-3/zh/sqlmap-xml.html
+      collection标签: 用于定义关联的list集合类型的封装规则
+      property: 定义list 属性名  private List<ThreeLevelCategoryVO> subCatList;
+      ofType： 定义了list中元素的类型
+    -->
+    <collection property="subCatList" ofType="com.icoding.vo.ThreeLevelCategoryVO">
+      <id column="subId" property="subId" jdbcType="INTEGER" />
+      <result column="subName" property="subName" jdbcType="VARCHAR" />
+      <result column="subType" property="subType" jdbcType="INTEGER" />
+      <result column="subFatherId" property="subFatherId" jdbcType="INTEGER" />
+    </collection>
+  </resultMap>
+
+  <sql id="BaseSql">
+    id, name, type, father_id, logo, slogan, cat_image, bg_color
+  </sql>
+
+  <!--根据类型查分类: 查询一级分类-->
+  <select id="queryCategoryByType" resultMap="BaseResultMap">
+    SELECT <include refid="BaseSql"/>
+    FROM category
+    WHERE type = #{type}
+  </select>
+
+  <!--查询子分类-->
+  <select id="queryCategoryByFatherId" resultMap="SubCategoryResultMap">
+    SELECT
+    f.id as id,
+    f.`name` as name,
+    f.type as type,
+    f.father_id as father_id,
+    c.id as subId,
+    c.`name` as subName,
+    c.type as subType,
+    c.father_id as subFatherId
+    FROM category f
+    LEFT JOIN category c
+    on c.father_id = f.id
+    WHERE f.father_id = #{fatherId}
+  </select>
 </mapper>
