@@ -1,18 +1,50 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.icoding.mapper.ItemsMapper" >
-  <resultMap id="BaseResultMap" type="com.icoding.pojo.Items" >
-    <!--
-      WARNING - @mbg.generated
-    -->
-    <id column="id" property="id" jdbcType="VARCHAR" />
-    <result column="item_name" property="itemName" jdbcType="VARCHAR" />
-    <result column="cat_id" property="catId" jdbcType="INTEGER" />
-    <result column="root_cat_id" property="rootCatId" jdbcType="INTEGER" />
-    <result column="sell_counts" property="sellCounts" jdbcType="INTEGER" />
-    <result column="on_off_status" property="onOffStatus" jdbcType="INTEGER" />
-    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
-    <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
-    <result column="content" property="content" jdbcType="LONGVARCHAR" />
-  </resultMap>
+<mapper namespace="com.icoding.mapper.ItemsMapper">
+    <resultMap id="BaseResultMap" type="com.icoding.pojo.Items">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="item_name" property="itemName" jdbcType="VARCHAR"/>
+        <result column="cat_id" property="catId" jdbcType="INTEGER"/>
+        <result column="root_cat_id" property="rootCatId" jdbcType="INTEGER"/>
+        <result column="sell_counts" property="sellCounts" jdbcType="INTEGER"/>
+        <result column="on_off_status" property="onOffStatus" jdbcType="INTEGER"/>
+        <result column="created_time" property="createdTime" jdbcType="TIMESTAMP"/>
+        <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP"/>
+        <result column="content" property="content" jdbcType="LONGVARCHAR"/>
+    </resultMap>
+
+    <resultMap id="NewSixItemsResultMap" type="com.icoding.vo.NewItemsCategoryVO">
+        <id column="rootCatId" property="rootCatId" jdbcType="INTEGER" />
+        <result column="rootCatName" property="rootCatName" jdbcType="VARCHAR" />
+        <result column="slogan" property="slogan" jdbcType="VARCHAR" />
+        <result column="catImage" property="catImage" jdbcType="VARCHAR" />
+        <result column="bgColor" property="bgColor" jdbcType="VARCHAR" />
+        <collection property="simpleItemList" ofType="com.icoding.vo.SimpleItemVO">
+            <id column="itemId" property="itemId" jdbcType="VARCHAR" />
+            <result column="itemName" property="itemName" jdbcType="VARCHAR" />
+            <result column="itemUrl" property="itemUrl" jdbcType="VARCHAR" />
+        </collection>
+    </resultMap>
+
+    <select id="queryItemsByCategory" resultMap="NewSixItemsResultMap">
+        SELECT
+            c.id as rootCatId,
+            c.name as rootCatName,
+            c.slogan as slogan,
+            c.cat_image as catImage,
+            c.bg_color as bgColor,
+            i.id as itemId,
+            i.item_name as itemName,
+            ii.url as itemUrl,
+            i.created_time as createdTime
+        FROM
+            category c
+        LEFT JOIN items i ON c.id = i.root_cat_id
+        LEFT JOIN items_img ii ON i.id = ii.item_id
+        WHERE c.id = #{rootCategoryId} AND ii.is_main = 1
+        ORDER BY i.created_time DESC LIMIT 6
+    </select>
 </mapper>

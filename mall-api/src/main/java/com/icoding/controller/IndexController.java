@@ -6,7 +6,9 @@ import com.icoding.pojo.Carousel;
 import com.icoding.pojo.Category;
 import com.icoding.service.CarouselService;
 import com.icoding.service.CategoryService;
+import com.icoding.service.ItemsService;
 import com.icoding.utils.JSONResult;
+import com.icoding.vo.NewItemsCategoryVO;
 import com.icoding.vo.SecondLevelCategoryVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -30,6 +32,9 @@ public class IndexController {
 
   @Autowired
   CategoryService categoryService;
+
+  @Autowired
+  ItemsService itemsService;
 
   @ApiOperation(value = "首页轮播图列表接口", notes = "首页轮播图列表", httpMethod = "GET")
   @Transactional(propagation = Propagation.SUPPORTS)
@@ -65,4 +70,17 @@ public class IndexController {
     return JSONResult.ok(subCategories);
   }
 
+
+  @ApiOperation(value = "推荐商品", notes = "首页各一级分类最新六款商品", httpMethod = "GET")
+  @Transactional(propagation = Propagation.SUPPORTS)
+  @GetMapping("/sixNewItems/{rootCatId}")
+  public JSONResult querySixNewItems(
+          @ApiParam(name = "rootCatId", value = "一级分类ID", required = true)
+          @PathVariable("rootCatId") Integer rootCatId) {
+    if(rootCatId == null) {
+      return JSONResult.errMsg("分类不存在");
+    }
+    List<NewItemsCategoryVO> items = itemsService.queryItemsByCategory(rootCatId);
+    return JSONResult.ok(items);
+  }
 }
