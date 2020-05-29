@@ -16,4 +16,30 @@
     <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
     <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
   </resultMap>
+
+
+  <select id="queryItemCommentCountByItemIdAndLevel" resultType="java.lang.Integer">
+    SELECT COUNT(1) FROM items_comments WHERE item_id = #{itemId}
+    <if test="level != 4">
+      AND comment_level = #{level}
+    </if>
+  </select>
+  <select id="queryItemComments" resultType="com.icoding.vo.ItemCommentVO">
+    SELECT
+        u.username,
+        u.nickname,
+        u.face as userface,
+        i.content,
+        i.sepc_name as specName,
+        i.created_time as createdTime
+    FROM items_comments i
+    LEFT JOIN users u
+    ON i.user_id = u.id
+    WHERE i.item_id = #{itemId}
+    <if test="level != 4">
+      AND i.comment_level = #{level}
+    </if>
+    ORDER BY i.id
+    LIMIT #{start}, #{end}
+  </select>
 </mapper>

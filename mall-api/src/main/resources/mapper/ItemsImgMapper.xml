@@ -13,4 +13,13 @@
     <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
     <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
   </resultMap>
+
+  <sql id="BaseSql">
+    id, item_id, url, sort, is_main, created_time, updated_time
+  </sql>
+    <select id="queryItemImgByItemId" resultMap="BaseResultMap">
+      SELECT <include refid="BaseSql"/>
+      FROM items_img
+      WHERE item_id = #{id}
+    </select>
 </mapper>

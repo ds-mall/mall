@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface ItemsMapper extends MyMapper<Items> {
   List<NewItemsCategoryVO> queryItemsByCategory(Integer rootCategoryId);
+  Items queryItemById(String id);
 }

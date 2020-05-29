@@ -15,4 +15,13 @@
     <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
     <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
   </resultMap>
+
+  <sql id="BaseSql">
+    id, item_id, name, stock, discounts, price_discount, price_normal, created_time, updated_time
+  </sql>
+    <select id="queryItemSpecByItemId" resultMap="BaseResultMap">
+      SELECT <include refid="BaseSql"/>
+      FROM items_spec
+      WHERE item_id = #{id}
+    </select>
 </mapper>

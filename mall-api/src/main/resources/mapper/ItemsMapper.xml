@@ -29,6 +29,10 @@
         </collection>
     </resultMap>
 
+    <sql id="BaseSql">
+        id, item_name, cat_id, root_cat_id, sell_counts, on_off_status, created_time, updated_time, content
+    </sql>
+
     <select id="queryItemsByCategory" resultMap="NewSixItemsResultMap">
         SELECT
             c.id as rootCatId,
@@ -46,5 +50,11 @@
         LEFT JOIN items_img ii ON i.id = ii.item_id
         WHERE c.id = #{rootCategoryId} AND ii.is_main = 1
         ORDER BY i.created_time DESC LIMIT 6
+    </select>
+
+    <select id="queryItemById" resultMap="BaseResultMap">
+       SELECT <include refid="BaseSql"/>
+       FROM items
+       WHERE id = #{id}
     </select>
 </mapper>

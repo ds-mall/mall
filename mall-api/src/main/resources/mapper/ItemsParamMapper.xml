@@ -19,4 +19,14 @@
     <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
     <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
   </resultMap>
+
+  <sql id="BaseSql">
+    id, item_id, produc_place, foot_period, brand, factory_name, factory_address, packaging_method, weight, storage_method, eat_method, created_time, updated_time
+  </sql>
+
+    <select id="queryItemParamByItemId" resultMap="BaseResultMap">
+      SELECT <include refid="BaseSql"/>
+      FROM items_param
+      WHERE item_id = #{id}
+    </select>
 </mapper>
