@@ -57,4 +57,87 @@
        FROM items
        WHERE id = #{id}
     </select>
+
+    <sql id="queryItemsSql">
+        FROM items i
+        LEFT JOIN items_img ii
+        ON i.id = ii.item_id
+        LEFT JOIN
+        (SELECT temp_spec.item_id as itemId, MIN(temp_spec.price_discount) as price from items_spec temp_spec GROUP BY temp_spec.item_id) iii
+        ON i.id = iii.itemId
+        WHERE ii.is_main = 1
+    </sql>
+
+    <sql id="queryItemsByCatIdSql">
+        <include refid="queryItemsSql"/>
+        <if test=" queryParams.catId != null ">
+            AND i.cat_id = #{queryParams.catId}
+        </if>
+    </sql>
+
+    <select id="queryItemsCountByKeywords" resultType="java.lang.Integer">
+        SELECT COUNT(1)
+        <include refid="queryItemsSql" />
+        <if test=" keywords != null and keywords != '' ">
+            AND i.item_name LIKE '%${keywords}%'
+        </if>
+    </select>
+
+    <select id="queryItemsByKeywords"  resultType="com.icoding.vo.SearchItemsVO">
+        SELECT
+        i.id as itemId,
+        i.item_name as itemName,
+        i.sell_counts as sellCounts,
+        ii.url as imgUrl,
+        iii.price as price
+        <include refid="queryItemsSql"/>
+        <if test=" queryParams.keywords != null and queryParams.keywords != '' ">
+            AND i.item_name LIKE '%${queryParams.keywords}%'
+        </if>
+        <choose>
+            <when test=' queryParams.sort == "c" '>
+                ORDER BY i.sell_counts DESC
+            </when>
+            <when test=' queryParams.sort == "p" '>
+                ORDER BY iii.price ASC
+            </when>
+            <otherwise>
+                ORDER BY i.item_name ASC
+            </otherwise>
+        </choose>
+        LIMIT #{queryParams.start}, #{queryParams.end}
+    </select>
+
+    <select id="queryItemsCountByCagegoryLevelThree" resultType="java.lang.Integer">
+        SELECT COUNT(1)
+        <include refid="queryItemsSql" />
+        <if test=" catId != null ">
+            AND i.cat_id = #{catId}
+        </if>
+    </select>
+
+    <select id="queryItemsByCategoryLevelThree" resultType="com.icoding.vo.SearchItemsVO">
+        SELECT
+        i.id as itemId,
+        i.item_name as itemName,
+        i.sell_counts as sellCounts,
+        ii.url as imgUrl,
+        iii.price as price
+        <include refid="queryItemsSql"/>
+        <if test=" queryParams.catId != null ">
+            AND i.cat_id = #{queryParams.catId}
+        </if>
+        <choose>
+            <when test=' queryParams.sort == "c" '>
+                ORDER BY i.sell_counts DESC
+            </when>
+            <when test=' queryParams.sort == "p" '>
+                ORDER BY iii.price ASC
+            </when>
+            <otherwise>
+                ORDER BY i.item_name ASC
+            </otherwise>
+        </choose>
+        LIMIT #{queryParams.start}, #{queryParams.end}
+    </select>
 </mapper>

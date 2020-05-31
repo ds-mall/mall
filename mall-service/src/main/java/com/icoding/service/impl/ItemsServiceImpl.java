@@ -12,12 +12,15 @@ import com.icoding.utils.PagedGridResult;
 import com.icoding.vo.ItemCommentLevelAndCountVO;
 import com.icoding.vo.ItemCommentVO;
 import com.icoding.vo.NewItemsCategoryVO;
+import com.icoding.vo.SearchItemsVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ItemsServiceImpl implements ItemsService {
@@ -97,6 +100,61 @@ public class ItemsServiceImpl implements ItemsService {
     result.setTotal(totalPages);
     result.setRecords(totalCounts);
     result.setRows(commentList);
+    return result;
+  }
+
+  @Transactional(propagation = Propagation.SUPPORTS)
+  @Override
+  public PagedGridResult<SearchItemsVO> queryItemByKeywords(String keywords, String sort, Integer page, Integer pageSize) {
+    if(page == null) page = 1;
+    if(pageSize == null) pageSize = 20;
+
+    int start = (page - 1) * pageSize;
+    int end = pageSize * page;
+
+    int totalCounts = itemsMapper.queryItemsCountByKeywords(keywords);
+    int totalPages = totalCounts % pageSize;
+
+    Map<String, Object> queryParams = new HashMap();
+    queryParams.put("keywords", keywords);
+    queryParams.put("sort", sort);
+    queryParams.put("start", start);
+    queryParams.put("end", end);
+    List<SearchItemsVO> searchItemsList = itemsMapper.queryItemsByKeywords(queryParams);
+
+    PagedGridResult<SearchItemsVO> result = new PagedGridResult<>();
+    result.setPage(page);
+    result.setTotal(totalPages);
+    result.setRecords(totalCounts);
+    result.setRows(searchItemsList);
+
+    return result;
+  }
+
+  @Override
+  public PagedGridResult<SearchItemsVO> queryItemByCategoryLevelThree(Integer catId, String sort, Integer page, Integer pageSize) {
+    if(page == null) page = 1;
+    if(pageSize == null) pageSize = 20;
+
+    int start = (page - 1) * pageSize;
+    int end = pageSize * page;
+
+    int totalCounts = itemsMapper.queryItemsCountByCagegoryLevelThree(catId);
+    int totalPages = totalCounts % pageSize;
+
+    Map<String, Object> queryParams = new HashMap();
+    queryParams.put("catId", catId);
+    queryParams.put("sort", sort);
+    queryParams.put("start", start);
+    queryParams.put("end", end);
+    List<SearchItemsVO> searchItemsList = itemsMapper.queryItemsByCategoryLevelThree(queryParams);
+
+    PagedGridResult<SearchItemsVO> result = new PagedGridResult<>();
+    result.setPage(page);
+    result.setTotal(totalPages);
+    result.setRecords(totalCounts);
+    result.setRows(searchItemsList);
+
     return result;
   }
 }

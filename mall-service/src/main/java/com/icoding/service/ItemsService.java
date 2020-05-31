@@ -8,6 +8,7 @@ import com.icoding.utils.PagedGridResult;
 import com.icoding.vo.ItemCommentLevelAndCountVO;
 import com.icoding.vo.ItemCommentVO;
 import com.icoding.vo.NewItemsCategoryVO;
+import com.icoding.vo.SearchItemsVO;
 
 import java.util.List;
 
@@ -63,4 +64,24 @@ public interface ItemsService {
    * @return
    */
   PagedGridResult<ItemCommentVO> queryItemComments(String id, Integer level, Integer page, Integer pageSize);
+
+  /**
+   * 根据关键字和排序规则查询商品列表
+   * @param keywords
+   * @param sort
+   * @param page
+   * @param pageSize
+   * @return
+   */
+  PagedGridResult<SearchItemsVO> queryItemByKeywords(String keywords, String sort, Integer page, Integer pageSize);
+
+  /**
+   * 根据三级分类ID查询商品列表
+   * @param catId
+   * @param sort
+   * @param page
+   * @param pageSize
+   * @return
+   */
+  PagedGridResult<SearchItemsVO> queryItemByCategoryLevelThree(Integer catId, String sort, Integer page, Integer pageSize);
 }
