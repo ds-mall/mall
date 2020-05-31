@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.icoding.mapper.ShopcartMapper" >
+
+
+    <select id="refresh" resultType="com.icoding.vo.ShopcartItemVO">
+        SELECT
+            item.id as itemId,
+            item.item_name as itemName,
+            img.url as itemImgUrl,
+            spec.id as specId,
+            spec.name as specName,
+            spec.price_discount as priceDiscount,
+            spec.price_normal as priceNormal
+        FROM items_spec spec
+        LEFT JOIN items item on spec.item_id = item.id
+        LEFT JOIN items_img img on item.id = img.item_id
+        WHERE img.is_main = 1
+        AND spec.id in
+        <foreach item="item" index="index" collection="list"
+                 open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+</mapper>

@@ -89,6 +89,8 @@ public class UserController {
 
     // 6 设置cookie
     CookieUtils.setCookie(req, rep, "user", JsonUtils.objectToJson(user), true);
+    // TODO 生成用户token, 存入redis中
+    // TODO 同步购物车数据(多端数据同步)
     return JSONResult.ok(user);
   }
 
@@ -115,7 +117,8 @@ public class UserController {
 
     // 4 设置cookie
     CookieUtils.setCookie(req, rep, "user", JsonUtils.objectToJson(user), true);
-
+    // TODO 生成用户token, 存入redis中
+    // TODO 同步购物车数据(多端数据同步)
     // 5 返回登录信息
     return JSONResult.ok(user);
   }
