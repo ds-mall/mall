@@ -18,4 +18,48 @@
     <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
     <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
   </resultMap>
+
+  <sql id="AddressBaseSql">
+	    id, receiver, mobile, province, city, district, detail, is_default as isDefault
+  </sql>
+
+  <select id="getAddressList" resultType="com.icoding.vo.UserAddressVO">
+        SELECT
+        <include refid="AddressBaseSql"/>
+        FROM user_address
+        WHERE user_id = #{userId}
+    </select>
+
+  <insert id="addNewAddress" parameterType="com.icoding.pojo.UserAddress">
+    INSERT INTO user_address
+    (id, user_id, receiver, mobile, province, city, district, detail, is_default, created_time, updated_time)
+    VALUES
+    (#{id}, #{userId}, #{receiver}, #{mobile}, #{province}, #{city}, #{district}, #{detail}, #{isDefault}, NOW(), NOW())
+  </insert>
+
+  <delete id="delAddress">
+    DELETE FROM user_address
+    WHERE id = #{addressId} AND user_id = #{userId}
+  </delete>
+
+  <update id="updateAddress" parameterType="com.icoding.pojo.UserAddress">
+    UPDATE user_address
+    SET
+    receiver = #{receiver},
+    mobile = #{mobile},
+    province = #{province},
+    city = #{city},
+    district = #{district},
+    detail = #{detail}
+    WHERE id = #{id} AND user_id = #{userId}
+  </update>
+  <update id="setDefault">
+    UPDATE user_address
+    SET is_default = 1
+    WHERE id = #{addressId} AND user_id = #{userId}
+  </update>
+  <update id="clearDefault">
+    UPDATE user_address SET is_default = 0 WHERE is_default = 1
+  </update>
 </mapper>
+
