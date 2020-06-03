@@ -157,4 +157,33 @@ public class ItemsServiceImpl implements ItemsService {
 
     return result;
   }
+
+  @Transactional(propagation = Propagation.REQUIRED)
+  @Override
+  public void decreaseItemSpecStock(String specId, Integer buyCount) {
+    /**
+     * 并发条件下是会存在超卖现象的 如何解决
+     * 1 synchronized：不推荐使用，集群下无用，性能地下
+     * 2 锁数据库: 不推荐使用, 导致数据库性能地下
+     * 3 分布式锁: zookeeper redis (终极方案)
+     */
+
+    /**
+     * TODO 后续会使用zookeeper和redis 解决集群和分布式环境下的数据一致性
+     * LockUtils.lock() // 加锁
+     * // 1 查询当前库存
+     * int currentStock = 10;
+     *
+     * // 2 判断是否超卖
+     * if(currentStock - buyCount < 0) {
+     * // 3 扣减库存
+     * }
+     * LockUtils.unlock() // 解 锁    *
+     */
+
+    int result = itemsSpecMapper.decreaseItemSpecStockBySpecId(specId, buyCount);
+    if(result != 1) {
+      throw new RuntimeException("订单创建失败, 原因：库存不足！");
+    }
+  }
 }

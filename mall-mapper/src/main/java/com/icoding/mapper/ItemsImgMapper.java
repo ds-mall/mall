@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface ItemsImgMapper extends MyMapper<ItemsImg> {
   List<ItemsImg> queryItemImgByItemId(String id);
+  String queryItemMainImg(String itemId);
 }

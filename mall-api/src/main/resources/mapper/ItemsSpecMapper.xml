@@ -19,7 +19,15 @@
   <sql id="BaseSql">
     id, item_id, name, stock, discounts, price_discount, price_normal, created_time, updated_time
   </sql>
-    <select id="queryItemSpecByItemId" resultMap="BaseResultMap">
+
+  <update id="decreaseItemSpecStockBySpecId">
+    UPDATE items_spec
+    SET stock = stock - #{buyCount}
+    WHERE id = #{specId}
+    AND stock >= #{buyCount}
+  </update>
+
+  <select id="queryItemSpecByItemId" resultMap="BaseResultMap">
       SELECT <include refid="BaseSql"/>
       FROM items_spec
       WHERE item_id = #{id}

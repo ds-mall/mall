@@ -1,6 +1,7 @@
 package com.icoding.service;
 
 import com.icoding.bo.UserAddressBO;
+import com.icoding.pojo.UserAddress;
 import com.icoding.vo.UserAddressVO;
 
 import java.util.List;
@@ -38,4 +39,5 @@ public interface AddressService {
    * @param addressId
    */
   void setDefault(String userId, String addressId);
+
 }

@@ -362,4 +362,125 @@ public class Orders {
     public void setUpdatedTime(Date updatedTime) {
         this.updatedTime = updatedTime;
     }
+
+
+    public static final class OrdersBuilder {
+        private String id;
+        private String userId;
+        private String receiverName;
+        private String receiverMobile;
+        private String receiverAddress;
+        private Integer totalAmount;
+        private Integer realPayAmount;
+        private Integer postAmount;
+        private Integer payMethod;
+        private String leftMsg;
+        private String extand;
+        private Integer isComment;
+        private Integer isDelete;
+        private Date createdTime;
+        private Date updatedTime;
+
+        private OrdersBuilder() {
+        }
+
+        public static OrdersBuilder anOrders() {
+            return new OrdersBuilder();
+        }
+
+        public OrdersBuilder withId(String id) {
+            this.id = id;
+            return this;
+        }
+
+        public OrdersBuilder withUserId(String userId) {
+            this.userId = userId;
+            return this;
+        }
+
+        public OrdersBuilder withReceiverName(String receiverName) {
+            this.receiverName = receiverName;
+            return this;
+        }
+
+        public OrdersBuilder withReceiverMobile(String receiverMobile) {
+            this.receiverMobile = receiverMobile;
+            return this;
+        }
+
+        public OrdersBuilder withReceiverAddress(String receiverAddress) {
+            this.receiverAddress = receiverAddress;
+            return this;
+        }
+
+        public OrdersBuilder withTotalAmount(Integer totalAmount) {
+            this.totalAmount = totalAmount;
+            return this;
+        }
+
+        public OrdersBuilder withRealPayAmount(Integer realPayAmount) {
+            this.realPayAmount = realPayAmount;
+            return this;
+        }
+
+        public OrdersBuilder withPostAmount(Integer postAmount) {
+            this.postAmount = postAmount;
+            return this;
+        }
+
+        public OrdersBuilder withPayMethod(Integer payMethod) {
+            this.payMethod = payMethod;
+            return this;
+        }
+
+        public OrdersBuilder withLeftMsg(String leftMsg) {
+            this.leftMsg = leftMsg;
+            return this;
+        }
+
+        public OrdersBuilder withExtand(String extand) {
+            this.extand = extand;
+            return this;
+        }
+
+        public OrdersBuilder withIsComment(Integer isComment) {
+            this.isComment = isComment;
+            return this;
+        }
+
+        public OrdersBuilder withIsDelete(Integer isDelete) {
+            this.isDelete = isDelete;
+            return this;
+        }
+
+        public OrdersBuilder withCreatedTime(Date createdTime) {
+            this.createdTime = createdTime;
+            return this;
+        }
+
+        public OrdersBuilder withUpdatedTime(Date updatedTime) {
+            this.updatedTime = updatedTime;
+            return this;
+        }
+
+        public Orders build() {
+            Orders orders = new Orders();
+            orders.setId(id);
+            orders.setUserId(userId);
+            orders.setReceiverName(receiverName);
+            orders.setReceiverMobile(receiverMobile);
+            orders.setReceiverAddress(receiverAddress);
+            orders.setTotalAmount(totalAmount);
+            orders.setRealPayAmount(realPayAmount);
+            orders.setPostAmount(postAmount);
+            orders.setPayMethod(payMethod);
+            orders.setLeftMsg(leftMsg);
+            orders.setExtand(extand);
+            orders.setIsComment(isComment);
+            orders.setIsDelete(isDelete);
+            orders.setCreatedTime(createdTime);
+            orders.setUpdatedTime(updatedTime);
+            return orders;
+        }
+    }
 }

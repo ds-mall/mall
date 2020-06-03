@@ -84,4 +84,11 @@ public interface ItemsService {
    * @return
    */
   PagedGridResult<SearchItemsVO> queryItemByCategoryLevelThree(Integer catId, String sort, Integer page, Integer pageSize);
+
+  /**
+   * 提交订单后扣减库存
+   * @param specId
+   * @param buyCount
+   */
+  void decreaseItemSpecStock(String specId, Integer buyCount);
 }

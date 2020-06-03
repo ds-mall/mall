@@ -218,4 +218,83 @@ public class OrderItems {
     public void setBuyCounts(Integer buyCounts) {
         this.buyCounts = buyCounts;
     }
+
+
+    public static final class OrderItemsBuilder {
+        private String id;
+        private String orderId;
+        private String itemId;
+        private String itemImg;
+        private String itemName;
+        private String itemSpecId;
+        private String itemSpecName;
+        private Integer price;
+        private Integer buyCounts;
+
+        private OrderItemsBuilder() {
+        }
+
+        public static OrderItemsBuilder anOrderItems() {
+            return new OrderItemsBuilder();
+        }
+
+        public OrderItemsBuilder withId(String id) {
+            this.id = id;
+            return this;
+        }
+
+        public OrderItemsBuilder withOrderId(String orderId) {
+            this.orderId = orderId;
+            return this;
+        }
+
+        public OrderItemsBuilder withItemId(String itemId) {
+            this.itemId = itemId;
+            return this;
+        }
+
+        public OrderItemsBuilder withItemImg(String itemImg) {
+            this.itemImg = itemImg;
+            return this;
+        }
+
+        public OrderItemsBuilder withItemName(String itemName) {
+            this.itemName = itemName;
+            return this;
+        }
+
+        public OrderItemsBuilder withItemSpecId(String itemSpecId) {
+            this.itemSpecId = itemSpecId;
+            return this;
+        }
+
+        public OrderItemsBuilder withItemSpecName(String itemSpecName) {
+            this.itemSpecName = itemSpecName;
+            return this;
+        }
+
+        public OrderItemsBuilder withPrice(Integer price) {
+            this.price = price;
+            return this;
+        }
+
+        public OrderItemsBuilder withBuyCounts(Integer buyCounts) {
+            this.buyCounts = buyCounts;
+            return this;
+        }
+
+        public OrderItems build() {
+            OrderItems orderItems = new OrderItems();
+            orderItems.setId(id);
+            orderItems.setOrderId(orderId);
+            orderItems.setItemId(itemId);
+            orderItems.setItemImg(itemImg);
+            orderItems.setItemName(itemName);
+            orderItems.setItemSpecId(itemSpecId);
+            orderItems.setItemSpecName(itemSpecName);
+            orderItems.setPrice(price);
+            orderItems.setBuyCounts(buyCounts);
+            return orderItems;
+        }
+    }
 }

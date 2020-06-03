@@ -22,4 +22,8 @@
       FROM items_img
       WHERE item_id = #{id}
     </select>
+
+    <select id="queryItemMainImg" resultType="java.lang.String">
+        SELECT url FROM items_img WHERE item_id = #{itemId} AND is_main = 1
+    </select>
 </mapper>
