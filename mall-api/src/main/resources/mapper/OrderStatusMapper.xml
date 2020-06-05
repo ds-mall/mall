@@ -14,4 +14,9 @@
     <result column="close_time" property="closeTime" jdbcType="TIMESTAMP" />
     <result column="comment_time" property="commentTime" jdbcType="TIMESTAMP" />
   </resultMap>
+    <update id="updateOrderStatus">
+      UPDATE order_status
+      SET order_status = #{orderStatus}
+      WHERE order_id = #{orderId}
+    </update>
 </mapper>

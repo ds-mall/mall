@@ -1,6 +1,7 @@
 package com.icoding.controller;
 
 import com.icoding.bo.SubmitOrderBO;
+import com.icoding.enums.OrderStatusEnum;
 import com.icoding.enums.PayMethod;
 import com.icoding.service.AddressService;
 import com.icoding.service.OrdersService;
@@ -10,6 +11,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -60,5 +62,12 @@ public class OrdersController {
 
     // 3 向支付中心发送当前订单， 用于保存支付中心的订单数据
     return JSONResult.ok(orderId);
+  }
+
+  @ApiOperation(value = "接收微信支付异步通知的回调地址", notes = "接收微信支付异步通知的回调地址", httpMethod = "POST")
+  @PostMapping("/norifyCallbackOnOrderPaid")
+  public Integer notifyCallbackOnOrderPaid(String orderId) {
+    ordersService.updateOrderStatus(orderId, OrderStatusEnum.WATI_DELIVER.getType());
+    return HttpStatus.OK.value();
   }
 }

@@ -123,4 +123,15 @@ public class OrdersServiceImpl implements OrdersService {
 
     return orderId;
   }
+
+  /**
+   * 修改订单状态
+   * @param orderId
+   * @param orderStatus
+   */
+  @Transactional(propagation = Propagation.REQUIRED)
+  @Override
+  public void updateOrderStatus(String orderId, Integer orderStatus) {
+    orderStatusMapper.updateOrderStatus(orderId, orderStatus);
+  }
 }
