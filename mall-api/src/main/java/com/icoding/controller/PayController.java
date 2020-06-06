@@ -1,6 +1,7 @@
 package com.icoding.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.icoding.config.WXPayConfig;
 import com.icoding.utils.JSONResult;
 import com.icoding.utils.SignUtil;
 import com.icoding.vo.PayjsNativeVO;
@@ -24,38 +25,36 @@ import java.util.Map;
 @RestController
 @RequestMapping("/pay")
 public class PayController {
-  // PAYJS Native 扫码支付（主扫） API地址
-  private static final String PAYJS_NATIVE_URL = "https://payjs.cn/api/native";
-  // payjs 商户号
-  private static final String MCHID = "1598662141";
-  // payjs 私钥
-  private static final String PRIVATE_KEY = "ORXtLA9gIl3YBARL";
-  // 支付成功回调接口地址
-  private static final String NOTIFY_URL = "http://localhost:8088/orders/norifyCallbackOnOrderPaid";
-
   @Autowired
   private RestTemplate restTemplate;
+
+  @Autowired
+  private WXPayConfig wxPayConfig;
 
   @ApiOperation(value = "微信扫码支付", notes = "微信扫码支付", httpMethod = "POST")
   @PostMapping(value = "/getWXPayQRCode")
   public JSONResult nativePay(@RequestParam("userId") String userId, @RequestParam("orderId") String orderId){
     Map<String,String> map = new HashMap<>();
     // 商户号
-    map.put("mchid", MCHID);
+    map.put("mchid", wxPayConfig.getMchid());
     // 金额(单位:分)
-    map.put("total_fee","" + 123);
+    map.put("total_fee","" + 1);
     // 商城内部订单号
     map.put("out_trade_no", orderId);
+    // 订单标题
+    String body = String.format("吃货多多-付款用户[%s]", userId);
+    map.put("body", body);
     // 接收微信支付异步通知的回调地址。必须为可直接访问的URL，不能带参数、session验证、csrf验证。留空则不通知
-    map.put("notify_url", NOTIFY_URL);
+    map.put("notify_url", wxPayConfig.getNotifyUrl());
     // 数据签名（签名算法:https://help.payjs.cn/api-lie-biao/qian-ming-suan-fa.html）
-    String md5 = SignUtil.sign(map, PRIVATE_KEY);
+    String md5 = SignUtil.sign(map, wxPayConfig.getPrivateKey());
 
     PayjsNativeVO payjsNativeVO = PayjsNativeVO.PayjsNativeVOBuilder.aPayjsNativeVO()
-            .withMchid(MCHID)
-            .withTotal_fee(123)
+            .withMchid(wxPayConfig.getMchid())
+            .withTotal_fee(1) // 为方便测试，所有金额设置为 1分钱
             .withOut_trade_no(orderId)
-            .withNotify_url(NOTIFY_URL)
+            .withBody(body)
+            .withNotify_url(wxPayConfig.getNotifyUrl())
             .withSign(md5.toUpperCase())
             .build();
 
@@ -67,7 +66,7 @@ public class PayController {
 
     HttpEntity<PayjsNativeVO> requsetEntity = new HttpEntity(payjsNativeVO, headers);
 
-    ResponseEntity<String> responseEntity = restTemplate.postForEntity(PAYJS_NATIVE_URL, requsetEntity, String.class);
+    ResponseEntity<String> responseEntity = restTemplate.postForEntity(wxPayConfig.getNativeUrl(), requsetEntity, String.class);
 
     String response = responseEntity.getBody();
 
@@ -75,5 +74,12 @@ public class PayController {
 //      return JSONResult.errMsg("创建订单失败，请联系管理员");
 //    }
     return JSONResult.ok(JSONObject.parse(response));
+  }
+
+  @ApiOperation(value = "查询订单状态", notes = "查询订单状态", httpMethod = "POST")
+  @PostMapping(value = "/getOrderInfo")
+  public JSONResult getPAYJSOrderInfo(String orderId, String userId) {
+    // TODO PAYJS 未开放通过自身订单号查询订单详情
+    return JSONResult.ok();
   }
 }
