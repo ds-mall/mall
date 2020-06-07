@@ -1,12 +1,21 @@
 package com.icoding.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.icoding.config.WXPayConfig;
+import com.icoding.enums.OrderStatusEnum;
+import com.icoding.enums.YesOrNo;
+import com.icoding.mapper.OrderStatusMapper;
+import com.icoding.pojo.OrderStatus;
+import com.icoding.utils.DateUtil;
 import com.icoding.utils.JSONResult;
 import com.icoding.utils.SignUtil;
+import com.icoding.vo.PayResultVO;
 import com.icoding.vo.PayjsNativeVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -25,11 +34,16 @@ import java.util.Map;
 @RestController
 @RequestMapping("/pay")
 public class PayController {
+  private static final Logger LOGGER = LoggerFactory.getLogger(PayController.class);
+
   @Autowired
   private RestTemplate restTemplate;
 
   @Autowired
   private WXPayConfig wxPayConfig;
+
+  @Autowired
+  OrderStatusMapper orderStatusMapper;
 
   @ApiOperation(value = "微信扫码支付", notes = "微信扫码支付", httpMethod = "POST")
   @PostMapping(value = "/getWXPayQRCode")
@@ -61,25 +75,53 @@ public class PayController {
     /**
      * 调用 PAYJS Native 扫码支付（主扫） API： https://help.payjs.cn/api-lie-biao/sao-ma-zhi-fu.html
      */
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
 
-    HttpEntity<PayjsNativeVO> requsetEntity = new HttpEntity(payjsNativeVO, headers);
+    OrderStatus orderStatus = orderStatusMapper.selectByPrimaryKey(orderId);
+    if(orderStatus.getOrderStatus().equals(OrderStatusEnum.WATI_PAY.getType())) {
+      // TODO 从redis中去获得这笔订单的微信支付二维码，如果订单状态没有支付没有就放入，这样的做法防止用户频繁刷新而调用微信接口
+      HttpHeaders headers = new HttpHeaders();
+      headers.setContentType(MediaType.APPLICATION_JSON);
 
-    ResponseEntity<String> responseEntity = restTemplate.postForEntity(wxPayConfig.getNativeUrl(), requsetEntity, String.class);
+      HttpEntity<PayjsNativeVO> requsetEntity = new HttpEntity(payjsNativeVO, headers);
 
-    String response = responseEntity.getBody();
+      ResponseEntity<String> responseEntity = restTemplate.postForEntity(wxPayConfig.getNativeUrl(), requsetEntity, String.class);
 
-//    if(response.getStatus() != 200) {
-//      return JSONResult.errMsg("创建订单失败，请联系管理员");
-//    }
-    return JSONResult.ok(JSONObject.parse(response));
+      String response = responseEntity.getBody();
+      // TODO 请求完成后 qrcode 放到 redis中
+      return JSONResult.ok(JSONObject.parse(response));
+    } else {
+      return JSONResult.errMsg("该订单不存在, 或已支付");
+    }
   }
 
   @ApiOperation(value = "查询订单状态", notes = "查询订单状态", httpMethod = "POST")
-  @PostMapping(value = "/getOrderInfo")
-  public JSONResult getPAYJSOrderInfo(String orderId, String userId) {
+  @PostMapping(value = "/getPaidOrderInfo")
+  public JSONResult getPAYJSOrderInfo(@RequestParam("payjsOrderId") String payjsOrderId) {
     // TODO PAYJS 未开放通过自身订单号查询订单详情
-    return JSONResult.ok();
+
+    Map<String,String> map = new HashMap<>();
+    // PAYJS 平台订单号
+    map.put("payjs_order_id", payjsOrderId);
+    // 数据签名
+    String md5 = SignUtil.sign(map, wxPayConfig.getPrivateKey());
+    map.put("sign", md5.toUpperCase());
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+
+    HttpEntity<HashMap> requsetEntity = new HttpEntity(map, headers);
+
+    ResponseEntity<String> responseEntity = restTemplate.postForEntity(wxPayConfig.getOrderStatusCheckUrl(), requsetEntity, String.class);
+    String response = responseEntity.getBody();
+    PayResultVO payResultVO = JSON.parseObject(response, PayResultVO.class);
+
+    if(payResultVO.getStatus() == YesOrNo.YES.getType()) {
+      LOGGER.info("*************订单: {} 支付成功 - 时间: {} *************", payResultVO.getOutTradeNo() ,payResultVO.getPaidTime());
+      LOGGER.info("* 商户订单号: {}", payResultVO.getPayjsOrderId());
+      LOGGER.info("* 微信订单号: {}", payResultVO.getTransactionId());
+      LOGGER.info("* 实际支付金额: {}", payResultVO.getTotalFee());
+      LOGGER.info("*****************************************************************************");
+    }
+    return JSONResult.ok(JSONObject.parse(response));
   }
 }

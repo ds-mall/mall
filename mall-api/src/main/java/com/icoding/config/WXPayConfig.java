@@ -14,6 +14,7 @@ public class WXPayConfig {
   private String mchid;
   private String privateKey;
   private String notifyUrl;
+  private String orderStatusCheckUrl;
 
   public String getNativeUrl() {
     return nativeUrl;
@@ -45,5 +46,13 @@ public class WXPayConfig {
 
   public void setNotifyUrl(String notifyUrl) {
     this.notifyUrl = notifyUrl;
+  }
+
+  public String getOrderStatusCheckUrl() {
+    return orderStatusCheckUrl;
+  }
+
+  public void setOrderStatusCheckUrl(String orderStatusCheckUrl) {
+    this.orderStatusCheckUrl = orderStatusCheckUrl;
   }
 }
