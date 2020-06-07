@@ -1,5 +1,6 @@
 package com.icoding.controller;
 
+import com.icoding.bo.PayjsNotifyBO;
 import com.icoding.bo.SubmitOrderBO;
 import com.icoding.enums.OrderStatusEnum;
 import com.icoding.enums.PayMethod;
@@ -10,6 +11,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 @RequestMapping("/orders")
 public class OrdersController {
+  private static final Logger LOGGER = LoggerFactory.getLogger(OrdersController.class);
 
   @Autowired
   AddressService addressService;
@@ -65,9 +69,12 @@ public class OrdersController {
   }
 
   @ApiOperation(value = "接收微信支付异步通知的回调地址", notes = "接收微信支付异步通知的回调地址", httpMethod = "POST")
-  @PostMapping("/norifyCallbackOnOrderPaid")
-  public Integer notifyCallbackOnOrderPaid(String orderId) {
-    ordersService.updateOrderStatus(orderId, OrderStatusEnum.WATI_DELIVER.getType());
+  @PostMapping("/notifyCallbackOnOrderPaid")
+  public Integer notifyCallbackOnOrderPaid(PayjsNotifyBO payjsNotifyBO, HttpServletRequest req) {
+    LOGGER.info("***************** 支付回调 start ***************");
+    LOGGER.info("支付回调携带信息- {}", payjsNotifyBO.toString());
+    ordersService.updateOrderStatus(payjsNotifyBO, OrderStatusEnum.WATI_DELIVER.getType());
+    LOGGER.info("***************** 支付回调 end ***************");
     return HttpStatus.OK.value();
   }
 }

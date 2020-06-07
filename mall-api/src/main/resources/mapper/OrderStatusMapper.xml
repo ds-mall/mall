@@ -16,7 +16,9 @@
   </resultMap>
     <update id="updateOrderStatus">
       UPDATE order_status
-      SET order_status = #{orderStatus}
-      WHERE order_id = #{orderId}
+      SET
+        order_status = #{orderStatus},
+        pay_time = #{payjsNotifyBO.time_end}
+      WHERE order_id = #{payjsNotifyBO.out_trade_no}
     </update>
 </mapper>

@@ -55,6 +55,8 @@ public class PayController {
     map.put("total_fee","" + 1);
     // 商城内部订单号
     map.put("out_trade_no", orderId);
+    // 回调附加信息(这里传递订单号)
+    map.put("attach", orderId);
     // 订单标题
     String body = String.format("吃货多多-付款用户[%s]", userId);
     map.put("body", body);
@@ -67,6 +69,7 @@ public class PayController {
             .withMchid(wxPayConfig.getMchid())
             .withTotal_fee(1) // 为方便测试，所有金额设置为 1分钱
             .withOut_trade_no(orderId)
+            .withAttach(orderId)
             .withBody(body)
             .withNotify_url(wxPayConfig.getNotifyUrl())
             .withSign(md5.toUpperCase())

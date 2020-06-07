@@ -1,5 +1,6 @@
 package com.icoding.service.impl;
 
+import com.icoding.bo.PayjsNotifyBO;
 import com.icoding.bo.SubmitOrderBO;
 import com.icoding.enums.YesOrNo;
 import com.icoding.enums.OrderStatusEnum;
@@ -126,12 +127,11 @@ public class OrdersServiceImpl implements OrdersService {
 
   /**
    * 修改订单状态
-   * @param orderId
-   * @param orderStatus
+   * @param payjsNotifyBO
    */
   @Transactional(propagation = Propagation.REQUIRED)
   @Override
-  public void updateOrderStatus(String orderId, Integer orderStatus) {
-    orderStatusMapper.updateOrderStatus(orderId, orderStatus);
+  public void updateOrderStatus(PayjsNotifyBO payjsNotifyBO, Integer orderStatus) {
+    orderStatusMapper.updateOrderStatus(payjsNotifyBO, orderStatus);
   }
 }
