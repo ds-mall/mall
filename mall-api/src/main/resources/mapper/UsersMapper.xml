@@ -23,6 +23,19 @@
     <sql id="baseSql">
         id,username, password, nickname,realname, face, mobile, email, sex, birthday, created_time, updated_time
     </sql>
+    <update id="updateUserInfo">
+        UPDATE users
+        SET
+            nickname = #{user.nickname},
+            sex = #{user.sex},
+            realname = #{user.realname},
+            birthday = #{user.birthday},
+            mobile = #{user.mobile},
+            email = #{user.email},
+            updated_time = NOW()
+        WHERE
+            id = #{user.id}
+    </update>
 
     <select id="getUserByUsername" resultMap="BaseResultMap">
        select id, username from users where username = #{username}

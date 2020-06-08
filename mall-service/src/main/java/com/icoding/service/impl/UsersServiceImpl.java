@@ -1,5 +1,6 @@
 package com.icoding.service.impl;
 
+import com.icoding.bo.UpdatedUserBO;
 import com.icoding.bo.UserBO;
 import com.icoding.enums.Sex;
 import com.icoding.mapper.UsersMapper;
@@ -78,5 +79,32 @@ public class UsersServiceImpl implements UsersService {
   @Override
   public Users queryUserForLogin(String username, String password) {
     return usersMapper.queryUserForLogin(username, password);
+  }
+
+  /**
+   * 根据userId获取用户信息
+   * @param userId
+   * @return
+   */
+  @Transactional(propagation = Propagation.SUPPORTS)
+  @Override
+  public Users queryUserInfo(String userId) {
+    Users user = usersMapper.selectByPrimaryKey(userId);
+    // 隐藏密码
+    user.setPassword("");
+    return user;
+  }
+
+  /**
+   * 更新用户信息
+   * @param userId
+   * @param updatedUserBO
+   */
+  @Transactional(propagation = Propagation.REQUIRED)
+  @Override
+  public void updateUserInfo(String userId, UpdatedUserBO updatedUserBO) {
+    Users user = updatedUserBO.converToPojo();
+    user.setId(userId);
+    usersMapper.updateUserInfo(user);
   }
 }
