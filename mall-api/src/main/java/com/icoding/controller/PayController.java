@@ -14,6 +14,8 @@ import com.icoding.vo.PayResultVO;
 import com.icoding.vo.PayjsNativeVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,8 +49,18 @@ public class PayController {
 
   @ApiOperation(value = "微信扫码支付", notes = "微信扫码支付", httpMethod = "POST")
   @PostMapping(value = "/getWXPayQRCode")
-  public JSONResult nativePay(@RequestParam("userId") String userId, @RequestParam("orderId") String orderId){
+  public JSONResult nativePay(
+          @ApiParam(name = "userId", value = "用户id", required = true)
+          @RequestParam("userId") String userId,
+          @ApiParam(name = "orderId", value = "订单id", required = true)
+          @RequestParam("orderId") String orderId,
+          @ApiParam(name = "payType", value = "支付方式，不传默认为微信支付，alipay为支付宝", required = false)
+          @RequestParam(value = "payType", required = false) String payType
+  ){
     Map<String,String> map = new HashMap<>();
+    if (StringUtils.isNotBlank(payType) && "alipay".equals(payType)) {
+      map.put("type", payType);
+    }
     // 商户号
     map.put("mchid", wxPayConfig.getMchid());
     // 金额(单位:分)
@@ -75,6 +87,10 @@ public class PayController {
             .withSign(md5.toUpperCase())
             .build();
 
+    if (StringUtils.isNotBlank(payType) && "alipay".equals(payType)) {
+      payjsNativeVO.setType(payType);
+    }
+    LOGGER.info("************* 获取支付二维码 start - {} *************", payjsNativeVO.toString());
     /**
      * 调用 PAYJS Native 扫码支付（主扫） API： https://help.payjs.cn/api-lie-biao/sao-ma-zhi-fu.html
      */

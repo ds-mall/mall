@@ -14,11 +14,30 @@
     <result column="close_time" property="closeTime" jdbcType="TIMESTAMP" />
     <result column="comment_time" property="commentTime" jdbcType="TIMESTAMP" />
   </resultMap>
-    <update id="updateOrderStatus">
-      UPDATE order_status
-      SET
+  <update id="updateOrderStatus">
+    UPDATE order_status
+    SET
+      order_status = #{orderStatus},
+      pay_time = #{payjsNotifyBO.time_end}
+    WHERE order_id = #{payjsNotifyBO.out_trade_no}
+  </update>
+
+  <update id="updateOrdersStatusByOrderId">
+    UPDATE order_status
+    SET
         order_status = #{orderStatus},
-        pay_time = #{payjsNotifyBO.time_end}
-      WHERE order_id = #{payjsNotifyBO.out_trade_no}
-    </update>
+        close_time = NOW()
+      WHERE order_id = #{orderId}
+  </update>
+
+  <select id="queryOrdersWhoseStatusIsWaitPayAndTimeOut" resultMap="BaseResultMap">
+    SELECT
+        order_id, order_status, created_time, pay_time, deliver_time, success_time, close_time, comment_time
+    FROM
+        order_status
+    WHERE
+        order_status = 10
+    AND
+	    DATEDIFF(NOW(), created_time) > 1
+  </select>
 </mapper>

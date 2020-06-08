@@ -86,6 +86,19 @@ public class PayjsNativeVO {
     this.sign = sign;
   }
 
+  @Override
+  public String toString() {
+    return "PayjsNativeVO{" +
+            "mchid='" + mchid + '\'' +
+            ", total_fee=" + total_fee +
+            ", out_trade_no='" + out_trade_no + '\'' +
+            ", body='" + body + '\'' +
+            ", notify_url='" + notify_url + '\'' +
+            ", attach='" + attach + '\'' +
+            ", type='" + type + '\'' +
+            ", sign='" + sign + '\'' +
+            '}';
+  }
 
   public static final class PayjsNativeVOBuilder {
     // 商户号

@@ -9,15 +9,19 @@ import com.icoding.pojo.*;
 import com.icoding.service.ItemsService;
 import com.icoding.service.OrdersService;
 import org.n3r.idworker.Sid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class OrdersServiceImpl implements OrdersService {
+  private static final Logger LOGGER = LoggerFactory.getLogger(OrdersServiceImpl.class);
 
   @Autowired
   Sid sid;
@@ -133,5 +137,26 @@ public class OrdersServiceImpl implements OrdersService {
   @Override
   public void updateOrderStatus(PayjsNotifyBO payjsNotifyBO, Integer orderStatus) {
     orderStatusMapper.updateOrderStatus(payjsNotifyBO, orderStatus);
+  }
+
+  /**
+   * 取消超时未支付订单(1天)
+   */
+  @Transactional(propagation = Propagation.REQUIRED)
+  @Override
+  public void closeOrdersWhoseStatusIsWaitPayAndTimeOut() {
+    LOGGER.info("*************** 关闭超时未支付订单 start ****************");
+    List<OrderStatus> watiPayAndTimeOutOrders = orderStatusMapper.queryOrdersWhoseStatusIsWaitPayAndTimeOut();
+    watiPayAndTimeOutOrders.stream().forEach(this::doClose);
+    LOGGER.info("*************** 关闭超时未支付订单 end ****************");
+  }
+
+  /**
+   * 执行关闭订单操作
+   * @param orderStatus
+   */
+  public void doClose(OrderStatus orderStatus) {
+    orderStatusMapper.updateOrdersStatusByOrderId(orderStatus.getOrderId(), OrderStatusEnum.CLOSE.getType());
+    LOGGER.info("close order: {}", orderStatus.getOrderId());
   }
 }
