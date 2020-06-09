@@ -8,6 +8,8 @@ import com.icoding.mapper.*;
 import com.icoding.pojo.*;
 import com.icoding.service.ItemsService;
 import com.icoding.service.OrdersService;
+import com.icoding.utils.PagedGridResult;
+import com.icoding.vo.UserCenterOrderVO;
 import org.n3r.idworker.Sid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +19,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class OrdersServiceImpl implements OrdersService {
@@ -149,6 +153,56 @@ public class OrdersServiceImpl implements OrdersService {
     List<OrderStatus> watiPayAndTimeOutOrders = orderStatusMapper.queryOrdersWhoseStatusIsWaitPayAndTimeOut();
     watiPayAndTimeOutOrders.stream().forEach(this::doClose);
     LOGGER.info("*************** 关闭超时未支付订单 end ****************");
+  }
+
+  /**
+   * 用户中心->我的订单->分类订单
+   * @param userId
+   * @param orderStatus
+   * @param page
+   * @param pageSize
+   * @return
+   */
+  @Transactional(propagation = Propagation.REQUIRED)
+  @Override
+  public PagedGridResult<UserCenterOrderVO> queryOrdersByStatus(String userId, Integer orderStatus, Integer page, Integer pageSize) {
+    if(page == null) page = 1;
+    if(pageSize == null) pageSize = 20;
+
+    int start = (page - 1) * pageSize;
+    int end = pageSize * page;
+
+    int totalCounts = ordersMapper.getOrdersCountByStatus(userId, orderStatus);
+    int totalPages = totalCounts % pageSize;
+
+    Map<String, Object> queryParams = new HashMap();
+    queryParams.put("userId", userId);
+    queryParams.put("orderStatus", orderStatus);
+    queryParams.put("start", start);
+    queryParams.put("end", end);
+
+    List<UserCenterOrderVO> rows = ordersMapper.getOrdersByStatus(queryParams);
+
+    PagedGridResult<UserCenterOrderVO> result = new PagedGridResult<>();
+    result.setPage(page);
+    result.setTotal(totalPages);
+    result.setRecords(totalCounts);
+    result.setRows(rows);
+
+    return result;
+  }
+
+  /**
+   * 根据用户id和订单id删除指定订单
+   * @param userId
+   * @param orderId
+   */
+  @Transactional(propagation = Propagation.REQUIRED)
+  @Override
+  public void deleteOrder(String userId, String orderId) {
+    ordersMapper.deleteOrder(userId, orderId);
+    orderItemMapper.deleteOrderItems(orderId);
+    orderStatusMapper.deleteOrderStatus(orderId);
   }
 
   /**

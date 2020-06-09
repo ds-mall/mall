@@ -29,8 +29,12 @@
         close_time = NOW()
       WHERE order_id = #{orderId}
   </update>
+    <delete id="deleteOrderStatus">
+      DELETE FROM order_status
+      WHERE order_id = #{orderId}
+    </delete>
 
-  <select id="queryOrdersWhoseStatusIsWaitPayAndTimeOut" resultMap="BaseResultMap">
+    <select id="queryOrdersWhoseStatusIsWaitPayAndTimeOut" resultMap="BaseResultMap">
     SELECT
         order_id, order_status, created_time, pay_time, deliver_time, success_time, close_time, comment_time
     FROM

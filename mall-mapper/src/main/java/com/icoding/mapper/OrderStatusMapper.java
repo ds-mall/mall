@@ -23,4 +23,10 @@ public interface OrderStatusMapper extends MyMapper<OrderStatus> {
    * @param orderStatus
    */
   void updateOrdersStatusByOrderId(@Param("orderId") String orderId, @Param("orderStatus") Integer orderStatus);
+
+  /**
+   * 删除订单状态
+   * @param orderId
+   */
+  void deleteOrderStatus(@Param("orderId") String orderId);
 }

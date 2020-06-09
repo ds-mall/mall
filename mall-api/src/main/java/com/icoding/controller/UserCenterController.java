@@ -1,5 +1,6 @@
 package com.icoding.controller;
 
+import com.alibaba.fastjson.JSONReader;
 import com.aliyun.oss.ClientException;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
@@ -8,9 +9,13 @@ import com.aliyun.oss.model.PutObjectRequest;
 import com.icoding.bo.UpdatedUserBO;
 import com.icoding.config.AliyunOssConfig;
 import com.icoding.pojo.Users;
+import com.icoding.service.OrdersService;
 import com.icoding.service.UsersService;
 import com.icoding.utils.JSONResult;
+import com.icoding.utils.PagedGridResult;
 import com.icoding.utils.ValidateUtils;
+import com.icoding.vo.ItemCommentVO;
+import com.icoding.vo.UserCenterOrderVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -21,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.List;
 
 @Api(value = "用户中心", tags = {"用户中心相关接口"})
 @RestController
@@ -29,6 +35,9 @@ public class UserCenterController {
 
   @Autowired
   UsersService usersService;
+
+  @Autowired
+  OrdersService ordersService;
 
   @Autowired
   AliyunOssConfig aliyunOssConfig;
@@ -113,6 +122,43 @@ public class UserCenterController {
     return JSONResult.ok("头像上传成功");
   }
 
+
+  @ApiOperation(value = "用户中心我的订单", notes = "根据状态查询订单", httpMethod = "POST")
+  @PostMapping("/orders")
+  public JSONResult getOrdersByStatus(
+          @ApiParam(name = "userId", value = "用户id", required = true)
+          @RequestParam("userId") String userId,
+          @ApiParam(name = "orderStatus", value = "订单状态", required = true)
+          @RequestParam("orderStatus") Integer orderStatus,
+          @ApiParam(name = "page", value = "当前页", required = true)
+          @RequestParam("page") Integer page,
+          @ApiParam(name = "pageSize", value = "每页条数", required = true)
+          @RequestParam("pageSize") Integer pageSize
+  ) {
+    if(StringUtils.isBlank(userId)) {
+      return JSONResult.errMsg("用户id不能为空");
+    }
+    PagedGridResult<UserCenterOrderVO> grid = ordersService.queryOrdersByStatus(userId, orderStatus, page, pageSize);
+    return JSONResult.ok(grid);
+  }
+
+  @ApiOperation(value = "删除订单", notes = "删除订单", httpMethod = "DELETE")
+  @DeleteMapping("/orders")
+  public JSONResult deleteOrder(
+          @ApiParam(name = "userId", value = "用户id", required = true)
+          @RequestParam("userId") String userId,
+          @ApiParam(name = "orderId", value = "订单id", required = true)
+          @RequestParam("orderId") String orderId
+  ) {
+    if(StringUtils.isBlank(userId)) {
+      return JSONResult.errMsg("用户id不能为空");
+    }
+    if(StringUtils.isBlank(orderId)) {
+      return JSONResult.errMsg("订单id不能为空");
+    }
+    ordersService.deleteOrder(userId, orderId);
+    return JSONResult.ok("订单删除成功");
+  }
 
   /**
    * 检查用户更新提交的用户信息是否正确

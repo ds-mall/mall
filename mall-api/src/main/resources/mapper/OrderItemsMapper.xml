@@ -15,4 +15,8 @@
     <result column="price" property="price" jdbcType="INTEGER" />
     <result column="buy_counts" property="buyCounts" jdbcType="INTEGER" />
   </resultMap>
+    <delete id="deleteOrderItems">
+      DELETE FROM order_items
+      WHERE order_id = #{orderId}
+    </delete>
 </mapper>
