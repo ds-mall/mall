@@ -151,5 +151,13 @@
             <version>1.2.70</version>
         </dependency>
 
+        <!--阿里云oss-->
+        <!-- https://mvnrepository.com/artifact/com.aliyun.oss/aliyun-sdk-oss -->
+        <dependency>
+            <groupId>com.aliyun.oss</groupId>
+            <artifactId>aliyun-sdk-oss</artifactId>
+            <version>3.9.1</version>
+        </dependency>
+
     </dependencies>
 </project>

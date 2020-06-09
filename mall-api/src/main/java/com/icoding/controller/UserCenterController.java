@@ -1,6 +1,12 @@
 package com.icoding.controller;
 
+import com.aliyun.oss.ClientException;
+import com.aliyun.oss.OSS;
+import com.aliyun.oss.OSSClientBuilder;
+import com.aliyun.oss.OSSException;
+import com.aliyun.oss.model.PutObjectRequest;
 import com.icoding.bo.UpdatedUserBO;
+import com.icoding.config.AliyunOssConfig;
 import com.icoding.pojo.Users;
 import com.icoding.service.UsersService;
 import com.icoding.utils.JSONResult;
@@ -11,6 +17,10 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 @Api(value = "用户中心", tags = {"用户中心相关接口"})
 @RestController
@@ -19,6 +29,9 @@ public class UserCenterController {
 
   @Autowired
   UsersService usersService;
+
+  @Autowired
+  AliyunOssConfig aliyunOssConfig;
 
   @ApiOperation(value = "获取用户信息", notes = "获取用户信息", httpMethod = "GET")
   @GetMapping("/userInfo")
@@ -55,6 +68,51 @@ public class UserCenterController {
       return result;
     }
   }
+
+  @ApiOperation(value = "上传用户头像", notes = "上传用户头像", httpMethod = "POST")
+  @PostMapping("/userface")
+  public JSONResult updateUserFace(
+          @ApiParam(name = "userId", value = "用户id", required = true)
+          @RequestParam("userId") String userId,
+          @ApiParam(name = "头像文件", value = "头像文件", required = true)
+          @RequestParam("file") MultipartFile file
+  ) {
+    String fileName = file.getOriginalFilename();
+    String suffix = fileName.substring(fileName.lastIndexOf("."));
+    String uploadFileName = userId + suffix;
+
+    //1 创建OSSClient实例
+    OSS ossClient = new OSSClientBuilder().build(
+            aliyunOssConfig.getEndpoint(),
+            aliyunOssConfig.getAccessKeyId(),
+            aliyunOssConfig.getAccessKeySecret());
+    // 2 上传图片
+    try {
+      PutObjectRequest putObjectRequest = new PutObjectRequest(
+              aliyunOssConfig.getBucketName(),
+              uploadFileName,
+              new ByteArrayInputStream(file.getBytes()));
+      ossClient.putObject(putObjectRequest);
+    } catch (OSSException oe) {
+      return JSONResult.errMsg(oe.getErrorMessage());
+    } catch (ClientException ce) {
+      return JSONResult.errMsg(ce.getErrorMessage());
+    } catch(IOException e) {
+      return JSONResult.errMsg(e.getMessage());
+    } finally {
+      if (ossClient != null) {
+        ossClient.shutdown();
+      }
+    }
+    // TODO 上传图片到阿里云oss后，访问url打开默认是下载图片， 需添加自定义域名才能访问
+
+    // 3 拼接上传后图片url  BucketName.Endpoint/ObjectName
+    String faceUrl = aliyunOssConfig.getBucketName() + "." + aliyunOssConfig.getEndpoint() + "/" + uploadFileName;
+    // 4 更新用户数据库的头像
+    usersService.updateUserFace(userId, faceUrl);
+    return JSONResult.ok("头像上传成功");
+  }
+
 
   /**
    * 检查用户更新提交的用户信息是否正确

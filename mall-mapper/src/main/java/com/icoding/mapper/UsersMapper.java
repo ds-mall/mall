@@ -8,4 +8,5 @@ public interface UsersMapper extends MyMapper<Users> {
   Users getUserByUsername(String username);
   Users queryUserForLogin(String username, String password);
   void updateUserInfo(@Param("user") Users user);
+  void updateUserFace(@Param("userId") String userId, @Param("face") String userFaceUrl);
 }

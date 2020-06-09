@@ -36,6 +36,13 @@
         WHERE
             id = #{user.id}
     </update>
+    <update id="updateUserFace">
+        UPDATE users
+        SET
+            face = #{face}
+        WHERE
+            id = #{userId}
+    </update>
 
     <select id="getUserByUsername" resultMap="BaseResultMap">
        select id, username from users where username = #{username}

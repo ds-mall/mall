@@ -23,4 +23,11 @@ public interface UsersService {
      * @param updatedUserBO
      */
     void updateUserInfo(String userId, UpdatedUserBO updatedUserBO);
+
+    /**
+     * 根据userId更新用户头像
+     * @param userId
+     * @param userFaceUrl
+     */
+    void updateUserFace(String userId, String userFaceUrl);
 }

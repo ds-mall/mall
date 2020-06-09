@@ -107,4 +107,15 @@ public class UsersServiceImpl implements UsersService {
     user.setId(userId);
     usersMapper.updateUserInfo(user);
   }
+
+  /**
+   * 更新用户头像
+   * @param userId
+   * @param userFaceUrl
+   */
+  @Transactional(propagation = Propagation.REQUIRED)
+  @Override
+  public void updateUserFace(String userId, String userFaceUrl) {
+    usersMapper.updateUserFace(userId, userFaceUrl);
+  }
 }
