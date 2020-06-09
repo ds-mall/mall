@@ -33,8 +33,10 @@
         <result column="isComment" property="isComment" jdbcType="INTEGER" />
         <result column="createdTime" property="createdTime" jdbcType="TIMESTAMP" />
         <result column="orderStatus" property="orderStatus" jdbcType="TIMESTAMP" />
-        <collection property="subOrderItemList" ofType="com.icoding.pojo.OrderItems">
-            <id property="id" column="orderItemId"/>
+        <collection property="subOrderItemList"
+                    ofType="com.icoding.pojo.OrderItems"
+                    select="selectItemsForOrder" column="orderId">
+<!--            <id property="id" column="orderItemId"/>-->
             <result property="itemId" column="itemId"/>
             <result property="itemImg" column="itemImg"/>
             <result property="itemName" column="itemName"/>
@@ -57,17 +59,9 @@
 	        o1.real_pay_amount as realPayAmount,
 	        o1.pay_method as payMethod,
 	        o1.is_comment as isComment,
-	        o1.created_time as createdTime,
-	        o2.id as orderItemId,
-	        o2.item_id as itemId,
-	        o2.item_img as itemImg,
-	        o2.item_name as itemName,
-	        o2.item_spec_id as itemSpecId,
-	        o2.item_spec_name as itemSpecName,
-	        o2.price as itemPrice,
-	        o2.buy_counts as buyCounts
+	        o1.created_time as createdTime
+
         FROM orders o1
-        LEFT JOIN order_items o2 ON o1.id = o2.order_id
         LEFT JOIN order_status o3 on o1.id = o3.order_id
         WHERE o1.user_id = #{queryParams.userId}
         <if test="queryParams.orderStatus != '' and queryParams.orderStatus != null">
@@ -75,6 +69,23 @@
         </if>
         LIMIT #{queryParams.start}, #{queryParams.end}
     </select>
+
+    <select id="selectItemsForOrder" resultType="com.icoding.pojo.OrderItems">
+        SELECT
+            o2.id as orderItemId,
+	        o2.item_id as itemId,
+	        o2.item_img as itemImg,
+	        o2.item_name as itemName,
+	        o2.item_spec_id as itemSpecId,
+	        o2.item_spec_name as itemSpecName,
+	        o2.price as itemPrice,
+	        o2.buy_counts as buyCounts
+	    FROM
+	        order_items o2
+	    WHERE
+	        o2.order_id = #{orderId}
+    </select>
+
     <select id="getOrdersCountByStatus" resultType="java.lang.Integer">
         SELECT
             COUNT(1)
