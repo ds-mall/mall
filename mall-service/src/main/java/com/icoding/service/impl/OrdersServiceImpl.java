@@ -196,16 +196,17 @@ public class OrdersServiceImpl implements OrdersService {
   }
 
   /**
-   * 根据用户id和订单id删除指定订单
+   * 根据用户id和订单id 将订单is_delete 状态改为1
    * @param userId
    * @param orderId
    */
   @Transactional(propagation = Propagation.REQUIRED)
   @Override
   public void deleteOrder(String userId, String orderId) {
-    ordersMapper.deleteOrder(userId, orderId);
-    orderItemMapper.deleteOrderItems(orderId);
-    orderStatusMapper.deleteOrderStatus(orderId);
+//    ordersMapper.deleteOrder(userId, orderId);
+//    orderItemMapper.deleteOrderItems(orderId);
+//    orderStatusMapper.deleteOrderStatus(orderId);
+    ordersMapper.setOrderDeleted(userId, orderId);
   }
 
   @Transactional(propagation = Propagation.SUPPORTS)

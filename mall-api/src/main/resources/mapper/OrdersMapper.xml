@@ -46,7 +46,14 @@
             <result property="buyCounts" column="buyCounts"/>
         </collection>
     </resultMap>
-    <delete id="deleteOrder">
+
+  <update id="setOrderDeleted">
+        UPDATE orders
+        SET is_delete = 1
+        WHERE id = #{orderId} AND user_id = #{userId}
+  </update>
+
+  <delete id="deleteOrder">
         DELETE FROM orders
         WHERE id = #{orderId} AND user_id = #{userId}
     </delete>
@@ -64,6 +71,7 @@
         FROM orders o1
         LEFT JOIN order_status o3 on o1.id = o3.order_id
         WHERE o1.user_id = #{queryParams.userId}
+        AND o1.is_delete != 1
         <if test="queryParams.orderStatus != '' and queryParams.orderStatus != null">
             and o3.order_status = #{queryParams.orderStatus}
         </if>
@@ -72,7 +80,7 @@
 
     <select id="selectItemsForOrder" resultType="com.icoding.pojo.OrderItems">
         SELECT
-            o2.id as orderItemId,
+          o2.id as orderItemId,
 	        o2.item_id as itemId,
 	        o2.item_img as itemImg,
 	        o2.item_name as itemName,
@@ -92,8 +100,9 @@
         FROM orders o1
         LEFT JOIN order_status o3 on o1.id = o3.order_id
         WHERE o1.user_id = #{userId}
+        AND o1.is_delete != 1
         <if test="orderStatus != '' and orderStatus != null">
-            and o3.order_status = #{orderStatus}
+            AND o3.order_status = #{orderStatus}
         </if>
     </select>
   <select id="queryOrderByUserIdAndOrderId" resultType="com.icoding.pojo.Orders">
