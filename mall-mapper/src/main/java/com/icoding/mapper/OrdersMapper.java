@@ -16,4 +16,6 @@ public interface OrdersMapper extends MyMapper<Orders> {
           @Param("orderStatus") Integer orderStatus);
 
   void deleteOrder(@Param("userId") String userId, @Param("orderId") String orderId);
+
+  Orders queryOrderByUserIdAndOrderId(@Param("userId") String userId, @Param("orderId") String orderId);
 }

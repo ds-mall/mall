@@ -8,6 +8,7 @@ import com.icoding.mapper.*;
 import com.icoding.pojo.*;
 import com.icoding.service.ItemsService;
 import com.icoding.service.OrdersService;
+import com.icoding.utils.JSONResult;
 import com.icoding.utils.PagedGridResult;
 import com.icoding.vo.UserCenterOrderVO;
 import org.n3r.idworker.Sid;
@@ -135,12 +136,14 @@ public class OrdersServiceImpl implements OrdersService {
 
   /**
    * 修改订单状态
-   * @param payjsNotifyBO
+   * @param orderId
+   * @param time
+   * @param orderStatus
    */
   @Transactional(propagation = Propagation.REQUIRED)
   @Override
-  public void updateOrderStatus(PayjsNotifyBO payjsNotifyBO, Integer orderStatus) {
-    orderStatusMapper.updateOrderStatus(payjsNotifyBO, orderStatus);
+  public void updateOrderStatus(String orderId, String time, Integer orderStatus) {
+    orderStatusMapper.updateOrderStatus(orderId, time, orderStatus);
   }
 
   /**
@@ -205,6 +208,12 @@ public class OrdersServiceImpl implements OrdersService {
     orderStatusMapper.deleteOrderStatus(orderId);
   }
 
+  @Transactional(propagation = Propagation.SUPPORTS)
+  @Override
+  public Orders queryOrderByUserIdAndOrderId(String userId, String orderId) {
+    return ordersMapper.queryOrderByUserIdAndOrderId(userId, orderId);
+  }
+
   /**
    * 执行关闭订单操作
    * @param orderStatus
@@ -212,5 +221,14 @@ public class OrdersServiceImpl implements OrdersService {
   public void doClose(OrderStatus orderStatus) {
     orderStatusMapper.updateOrdersStatusByOrderId(orderStatus.getOrderId(), OrderStatusEnum.CLOSE.getType());
     LOGGER.info("close order: {}", orderStatus.getOrderId());
+  }
+
+  // 用于验证用户和订单是否有关联关系，防止恶意篡改他人订单
+  public JSONResult checkOrder(String userId, String orderId) {
+    Orders order = queryOrderByUserIdAndOrderId(userId, orderId);
+    if(order == null) {
+      return JSONResult.errMsg("查无此订单");
+    }
+    return JSONResult.ok();
   }
 }

@@ -4,8 +4,10 @@ import com.icoding.bo.PayjsNotifyBO;
 import com.icoding.bo.SubmitOrderBO;
 import com.icoding.enums.OrderStatusEnum;
 import com.icoding.enums.PayMethod;
+import com.icoding.pojo.Orders;
 import com.icoding.service.AddressService;
 import com.icoding.service.OrdersService;
+import com.icoding.utils.DateUtil;
 import com.icoding.utils.JSONResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -16,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import tk.mybatis.mapper.util.StringUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -73,8 +76,34 @@ public class OrdersController {
   public Integer notifyCallbackOnOrderPaid(PayjsNotifyBO payjsNotifyBO, HttpServletRequest req) {
     LOGGER.info("***************** 支付回调 start ***************");
     LOGGER.info("支付回调携带信息- {}", payjsNotifyBO.toString());
-    ordersService.updateOrderStatus(payjsNotifyBO, OrderStatusEnum.WATI_DELIVER.getType());
+    String orderId = payjsNotifyBO.getOut_trade_no();
+    String time = payjsNotifyBO.getTime_end();
+    ordersService.updateOrderStatus(orderId, time, OrderStatusEnum.WATI_DELIVER.getType());
     LOGGER.info("***************** 支付回调 end ***************");
     return HttpStatus.OK.value();
+  }
+
+  // 暂时没有后端oms， 所以该接口用于模拟发货
+  @ApiOperation(value = "商家发货", notes = "商家发货并修改订单状态为30", httpMethod = "POST")
+  @PostMapping("/deliver")
+  public JSONResult deliver(@RequestParam("orderId") String orderId) {
+    LOGGER.info("***************** 商家发货 start ***************");
+    ordersService.updateOrderStatus(orderId, DateUtil.getCurrentDateString(), OrderStatusEnum.WATI_RECEIVE.getType());
+    LOGGER.info("***************** 商家发货 end ***************");
+    return JSONResult.ok("商家发货成功");
+  }
+
+  @ApiOperation(value = "用户确认收货", notes = "用户确认收货并修改订单状态为40", httpMethod = "POST")
+  @PostMapping("/receive")
+  public JSONResult receive(@RequestParam("orderId") String orderId, @RequestParam("userId") String userId) {
+    JSONResult result = ordersService.checkOrder(userId, orderId);
+    if(result.getStatus() != HttpStatus.OK.value()) {
+      return result;
+    }
+
+    LOGGER.info("***************** 确认收货 start ***************");
+    ordersService.updateOrderStatus(orderId, DateUtil.getCurrentDateString(), OrderStatusEnum.SUCCESS.getType());
+    LOGGER.info("***************** 确认收货 end ***************");
+    return result;
   }
 }

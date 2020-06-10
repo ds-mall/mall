@@ -96,4 +96,10 @@
             and o3.order_status = #{orderStatus}
         </if>
     </select>
+  <select id="queryOrderByUserIdAndOrderId" resultType="com.icoding.pojo.Orders">
+    SELECT
+        id, user_id, receiver_name, receiver_mobile, receiver_address, total_amount, real_pay_amount, post_amount, pay_method, left_msg, extand, is_comment, is_delete, created_time, updated_time
+    FROM orders
+    WHERE id = #{orderId} AND user_id = #{userId}
+  </select>
 </mapper>

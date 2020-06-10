@@ -18,8 +18,16 @@
     UPDATE order_status
     SET
       order_status = #{orderStatus},
-      pay_time = #{payjsNotifyBO.time_end}
-    WHERE order_id = #{payjsNotifyBO.out_trade_no}
+      <if test="orderStatus == 20">
+        pay_time = #{time}
+      </if>
+      <if test="orderStatus == 30">
+        deliver_time = #{time}
+      </if>
+      <if test="orderStatus == 40">
+        success_time = #{time}
+      </if>
+    WHERE order_id = #{orderId}
   </update>
 
   <update id="updateOrdersStatusByOrderId">

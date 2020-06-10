@@ -9,7 +9,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface OrderStatusMapper extends MyMapper<OrderStatus> {
-  void updateOrderStatus(@Param("payjsNotifyBO") PayjsNotifyBO payjsNotifyBO, @Param("orderStatus") Integer orderStatus);
+  void updateOrderStatus(@Param("orderId") String orderId , @Param("time") String time , @Param("orderStatus") Integer orderStatus);
 
   /**
    * 查询超时未支付订单

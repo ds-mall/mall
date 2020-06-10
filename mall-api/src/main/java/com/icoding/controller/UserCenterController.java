@@ -21,6 +21,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -156,8 +157,14 @@ public class UserCenterController {
     if(StringUtils.isBlank(orderId)) {
       return JSONResult.errMsg("订单id不能为空");
     }
+
+    JSONResult result = ordersService.checkOrder(userId, orderId);
+    if(result.getStatus() != HttpStatus.OK.value()) {
+      return result;
+    }
+
     ordersService.deleteOrder(userId, orderId);
-    return JSONResult.ok("订单删除成功");
+    return result;
   }
 
   /**
