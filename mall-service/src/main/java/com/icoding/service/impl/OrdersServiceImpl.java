@@ -10,6 +10,7 @@ import com.icoding.service.ItemsService;
 import com.icoding.service.OrdersService;
 import com.icoding.utils.JSONResult;
 import com.icoding.utils.PagedGridResult;
+import com.icoding.vo.OrderStatusCountVO;
 import com.icoding.vo.UserCenterOrderVO;
 import org.n3r.idworker.Sid;
 import org.slf4j.Logger;
@@ -224,11 +225,13 @@ public class OrdersServiceImpl implements OrdersService {
     LOGGER.info("close order: {}", orderStatus.getOrderId());
   }
 
+  @Transactional(propagation = Propagation.SUPPORTS)
   @Override
   public List<OrderItems> getItemsByOrderId(String orderId) {
     return orderItemMapper.getOrderItemsByOrderId(orderId);
   }
 
+  @Transactional(propagation = Propagation.REQUIRED)
   @Override
   public void setOrderIsCommented(String userId, String orderId) {
     ordersMapper.setOrderIsCommented(userId, orderId);
@@ -241,5 +244,64 @@ public class OrdersServiceImpl implements OrdersService {
       return JSONResult.errMsg("查无此订单");
     }
     return JSONResult.ok(order);
+  }
+
+  @Transactional(propagation = Propagation.SUPPORTS)
+  @Override
+  public OrderStatusCountVO getOrderStatusCounts(String userId) {
+    Map<String, Object> map = new HashMap<>();
+    map.put("userId", userId);
+
+    // 待支付
+    map.put("orderStatus", OrderStatusEnum.WATI_PAY.getType());
+    int waitPayCounts = ordersMapper.getMyOrderStatusCounts(map);
+
+    // 待发货
+    map.put("orderStatus", OrderStatusEnum.WATI_DELIVER.getType());
+    int waitDeliverCounts = ordersMapper.getMyOrderStatusCounts(map);
+
+    // 待收货
+    map.put("orderStatus", OrderStatusEnum.WATI_RECEIVE.getType());
+    int waitReceiveCounts = ordersMapper.getMyOrderStatusCounts(map);
+
+    // 待评论
+    map.put("orderStatus", OrderStatusEnum.SUCCESS.getType());
+    map.put("isComment", YesOrNo.NO.getType());
+    int waitCommentCounts = ordersMapper.getMyOrderStatusCounts(map);
+
+    OrderStatusCountVO orderStatusCountVO = new OrderStatusCountVO();
+    orderStatusCountVO.setWaitPayCounts(waitPayCounts);
+    orderStatusCountVO.setWaitDeliverCounts(waitDeliverCounts);
+    orderStatusCountVO.setWaitReceiveCounts(waitReceiveCounts);
+    orderStatusCountVO.setWaitCommentCounts(waitCommentCounts);
+
+    return orderStatusCountVO;
+  }
+
+  @Transactional(propagation = Propagation.SUPPORTS)
+  @Override
+  public PagedGridResult getOrdersTrend(String userId, Integer page, Integer pageSize) {
+    if(page == null) page = 1;
+    if(pageSize == null) pageSize = 20;
+
+    int start = (page - 1) * pageSize;
+    int end = pageSize * page;
+
+    int totalCounts = ordersMapper.getOrderTrendCounts(userId);
+    int totalPages = totalCounts % pageSize;
+
+    Map<String, Object> queryParams = new HashMap();
+    queryParams.put("userId", userId);
+    queryParams.put("start", start);
+    queryParams.put("end", end);
+
+    List<OrderStatus> rows = ordersMapper.getOrderTrendList(queryParams);
+
+    PagedGridResult<OrderStatus> result = new PagedGridResult<>();
+    result.setPage(page);
+    result.setTotal(totalPages);
+    result.setRecords(totalCounts);
+    result.setRows(rows);
+    return result;
   }
 }

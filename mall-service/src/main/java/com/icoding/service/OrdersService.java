@@ -5,9 +5,11 @@ import com.icoding.pojo.OrderItems;
 import com.icoding.pojo.Orders;
 import com.icoding.utils.JSONResult;
 import com.icoding.utils.PagedGridResult;
+import com.icoding.vo.OrderStatusCountVO;
 import com.icoding.vo.UserCenterOrderVO;
 
 import java.util.List;
+import java.util.Map;
 
 public interface OrdersService {
   /**
@@ -77,4 +79,20 @@ public interface OrdersService {
    * @param orderId
    */
   void setOrderIsCommented(String userId, String orderId);
+
+  /**
+   * 根据条件查询订单数量
+   * @param userId
+   * @return
+   */
+  OrderStatusCountVO getOrderStatusCounts(String userId);
+
+  /**
+   * 获取用户中心首页的 订单动向列表
+   * @param userId
+   * @param page
+   * @param pageSize
+   * @return
+   */
+  public PagedGridResult getOrdersTrend(String userId, Integer page, Integer pageSize);
 }

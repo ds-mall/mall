@@ -1,6 +1,5 @@
 package com.icoding.controller;
 
-import com.alibaba.fastjson.JSONReader;
 import com.aliyun.oss.ClientException;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
@@ -8,13 +7,17 @@ import com.aliyun.oss.OSSException;
 import com.aliyun.oss.model.PutObjectRequest;
 import com.icoding.bo.UpdatedUserBO;
 import com.icoding.config.AliyunOssConfig;
+import com.icoding.enums.YesOrNo;
+import com.icoding.pojo.OrderItems;
+import com.icoding.pojo.OrderStatus;
+import com.icoding.pojo.Orders;
 import com.icoding.pojo.Users;
 import com.icoding.service.OrdersService;
 import com.icoding.service.UsersService;
 import com.icoding.utils.JSONResult;
 import com.icoding.utils.PagedGridResult;
 import com.icoding.utils.ValidateUtils;
-import com.icoding.vo.ItemCommentVO;
+import com.icoding.vo.OrderStatusCountVO;
 import com.icoding.vo.UserCenterOrderVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -42,6 +45,19 @@ public class UserCenterController {
 
   @Autowired
   AliyunOssConfig aliyunOssConfig;
+
+  @ApiOperation(value = "获取用户信息", notes = "获取用户信息", httpMethod = "GET")
+  @GetMapping("/statusCounts")
+  public JSONResult getOrderStatusCounts(
+          @ApiParam(name = "userId", value = "用户id", required = true)
+          @RequestParam("userId") String userId
+  ) {
+    if(StringUtils.isBlank(userId)) {
+      return JSONResult.errMsg("userId为空");
+    }
+    OrderStatusCountVO orderStatusCountVO = ordersService.getOrderStatusCounts(userId);
+    return JSONResult.ok(orderStatusCountVO);
+  }
 
   @ApiOperation(value = "获取用户信息", notes = "获取用户信息", httpMethod = "GET")
   @GetMapping("/userInfo")
@@ -200,5 +216,23 @@ public class UserCenterController {
     }
 
     return JSONResult.ok();
+  }
+
+  @ApiOperation(value = "用户中心-订单动向", notes = "用户中心-订单动向", httpMethod = "GET")
+  @GetMapping("/trend")
+  public JSONResult getItemsByOrderId(
+          @ApiParam(name = "用户id", value = "用户id", required = true)
+          @RequestParam("userId") String userId,
+          @ApiParam(name = "page", value = "当前页", required = true)
+          @RequestParam("page") Integer page,
+          @ApiParam(name = "pageSize", value = "每页条数", required = true)
+          @RequestParam("pageSize") Integer pageSize
+  ) {
+    if(StringUtils.isBlank(userId)) {
+      return JSONResult.errMsg("用户id为空");
+    }
+
+    PagedGridResult<OrderStatus> grid = ordersService.getOrdersTrend(userId, page, pageSize);
+    return JSONResult.ok(grid);
   }
 }

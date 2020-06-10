@@ -116,4 +116,35 @@
     FROM orders
     WHERE id = #{orderId} AND user_id = #{userId}
   </select>
+  <select id="getMyOrderStatusCounts" resultType="java.lang.Integer">
+    SELECT
+        COUNT(1)
+    FROM
+        orders o
+    LEFT JOIN order_status os
+    ON o.id = os.order_id
+    WHERE o.user_id = #{queryParams.userId}
+    AND os.order_status = #{queryParams.orderStatus}
+    <if test="queryParams.isComment != null">
+        AND o.is_comment = #{queryParams.isComment}
+    </if>
+  </select>
+
+  <select id="getOrderTrendCounts" resultType="java.lang.Integer">
+    SELECT count(1) FROM order_status WHERE order_status in (20, 30, 40)
+  </select>
+
+  <select id="getOrderTrendList" resultType="com.icoding.pojo.OrderStatus">
+    SELECT
+        order_id as orderId,
+        order_status as orderStatus,
+        created_time as createdTime,
+        pay_time as payTime,
+        deliver_time as deliverTime,
+        success_time as successTime,
+        close_time as closeTime,
+        comment_time as commentTime
+    FROM order_status WHERE order_status in (20, 30, 40)
+    LIMIT #{queryParams.start}, #{queryParams.end}
+  </select>
 </mapper>

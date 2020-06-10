@@ -1,6 +1,7 @@
 package com.icoding.mapper;
 
 import com.icoding.my.mapper.MyMapper;
+import com.icoding.pojo.OrderStatus;
 import com.icoding.pojo.Orders;
 import com.icoding.vo.UserCenterOrderVO;
 import org.apache.ibatis.annotations.Param;
@@ -38,4 +39,15 @@ public interface OrdersMapper extends MyMapper<Orders> {
    * @param orderId
    */
   void setOrderIsCommented(@Param("userId") String userId, @Param("orderId") String orderId);
+
+  /**
+   * 查询各订单状态下的订单数量
+   * @param queryParams
+   * @return
+   */
+  int getMyOrderStatusCounts(@Param("queryParams") Map<String, Object> queryParams);
+
+  int getOrderTrendCounts(@Param("userId") String userId);
+
+  List<OrderStatus> getOrderTrendList(@Param("queryParams") Map<String, Object> map);
 }
