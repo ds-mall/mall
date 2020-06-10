@@ -4,6 +4,8 @@ import com.icoding.bo.PayjsNotifyBO;
 import com.icoding.bo.SubmitOrderBO;
 import com.icoding.enums.OrderStatusEnum;
 import com.icoding.enums.PayMethod;
+import com.icoding.enums.YesOrNo;
+import com.icoding.pojo.OrderItems;
 import com.icoding.pojo.Orders;
 import com.icoding.service.AddressService;
 import com.icoding.service.OrdersService;
@@ -18,10 +20,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import tk.mybatis.mapper.util.StringUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 
 @Api(value = "订单", tags = {"订单模块相关接口"})
@@ -105,5 +107,23 @@ public class OrdersController {
     ordersService.updateOrderStatus(orderId, DateUtil.getCurrentDateString(), OrderStatusEnum.SUCCESS.getType());
     LOGGER.info("***************** 确认收货 end ***************");
     return result;
+  }
+
+  @ApiOperation(value = "查询订单商品", notes = "查询订单商品", httpMethod = "GET")
+  @GetMapping("/items")
+  public JSONResult getItemsByOrderId(
+          @RequestParam("userId") String userId,
+          @RequestParam("orderId") String orderId) {
+    JSONResult result = ordersService.checkOrder(userId, orderId);
+    if(result.getStatus() != HttpStatus.OK.value()) {
+      return result;
+    }
+    Orders order = (Orders)result.getData();
+    if(order.getIsComment() == YesOrNo.YES.getType()) {
+      return JSONResult.errMsg("该笔订单已完成评价");
+    }
+
+    List<OrderItems> orderItems = ordersService.getItemsByOrderId(orderId);
+    return JSONResult.ok(orderItems);
   }
 }

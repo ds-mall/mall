@@ -52,6 +52,11 @@
         SET is_delete = 1
         WHERE id = #{orderId} AND user_id = #{userId}
   </update>
+  <update id="setOrderIsCommented">
+    UPDATE orders
+    SET is_comment = 1
+    WHERE id = #{orderId} AND user_id = #{userId}
+  </update>
 
   <delete id="deleteOrder">
         DELETE FROM orders

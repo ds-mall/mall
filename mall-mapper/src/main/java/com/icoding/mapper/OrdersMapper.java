@@ -31,4 +31,11 @@ public interface OrdersMapper extends MyMapper<Orders> {
 
 
   Orders queryOrderByUserIdAndOrderId(@Param("userId") String userId, @Param("orderId") String orderId);
+
+  /**
+   * 评论成功后 修改订单的 is_comment状态为1
+   * @param userId
+   * @param orderId
+   */
+  void setOrderIsCommented(@Param("userId") String userId, @Param("orderId") String orderId);
 }

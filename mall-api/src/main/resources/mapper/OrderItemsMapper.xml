@@ -19,4 +19,10 @@
       DELETE FROM order_items
       WHERE order_id = #{orderId}
     </delete>
+  <select id="getOrderItemsByOrderId" resultMap="BaseResultMap">
+    SELECT
+        id, order_id, item_id, item_img, item_name, item_spec_id, item_spec_name, price, buy_counts
+    FROM order_items
+    WHERE order_id = #{orderId}
+  </select>
 </mapper>

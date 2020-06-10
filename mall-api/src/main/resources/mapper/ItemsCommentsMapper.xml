@@ -10,12 +10,27 @@
     <result column="item_id" property="itemId" jdbcType="VARCHAR" />
     <result column="item_name" property="itemName" jdbcType="VARCHAR" />
     <result column="item_spec_id" property="itemSpecId" jdbcType="VARCHAR" />
-    <result column="sepc_name" property="sepcName" jdbcType="VARCHAR" />
+    <result column="spec_name" property="specName" jdbcType="VARCHAR" />
     <result column="comment_level" property="commentLevel" jdbcType="INTEGER" />
     <result column="content" property="content" jdbcType="VARCHAR" />
     <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
     <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
   </resultMap>
+  <insert id="batchInsertComments">
+    INSERT INTO items_comments
+    (id, user_id, item_id, item_name, item_spec_id, spec_name, comment_level, content, created_time, updated_time)
+    VALUES
+    <foreach
+        collection="commentsList"
+        item="comment"
+        index="index"
+        separator=",">
+        (
+            #{comment.id}, #{comment.userId}, #{comment.itemId}, #{comment.itemName}, #{comment.itemSpecId},
+            #{comment.specName}, #{comment.commentLevel}, #{comment.content}, NOW(), NOW()
+        )
+    </foreach>
+  </insert>
 
 
   <select id="queryItemCommentCountByItemIdAndLevel" resultType="java.lang.Integer">
@@ -41,5 +56,25 @@
     </if>
     ORDER BY i.id
     LIMIT #{start}, #{end}
+  </select>
+  <select id="getUserCommentsCounts" resultType="java.lang.Integer">
+    SELECT COUNT(1) FROM items_comments WHERE user_id = #{userId}
+  </select>
+  <select id="getUserComments" resultType="com.icoding.vo.UserCenterCommentVO">
+    SELECT
+    ic.id as commentId,
+    ic.content as content,
+    ic.created_time as createdTime,
+    ic.item_id as itemId,
+    ic.item_name as itemName,
+    ic.spec_name as specName,
+    ii.url
+  FROM items_comments ic
+  LEFT JOIN items_img ii
+  ON ic.item_id = ii.item_id
+  WHERE ic.user_id = #{userId}
+  AND ii.is_main = 1
+  ORDER BY ic.created_time DESC
+  LIMIT #{start}, #{end}
   </select>
 </mapper>

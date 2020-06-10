@@ -224,12 +224,22 @@ public class OrdersServiceImpl implements OrdersService {
     LOGGER.info("close order: {}", orderStatus.getOrderId());
   }
 
+  @Override
+  public List<OrderItems> getItemsByOrderId(String orderId) {
+    return orderItemMapper.getOrderItemsByOrderId(orderId);
+  }
+
+  @Override
+  public void setOrderIsCommented(String userId, String orderId) {
+    ordersMapper.setOrderIsCommented(userId, orderId);
+  }
+
   // 用于验证用户和订单是否有关联关系，防止恶意篡改他人订单
   public JSONResult checkOrder(String userId, String orderId) {
     Orders order = queryOrderByUserIdAndOrderId(userId, orderId);
     if(order == null) {
       return JSONResult.errMsg("查无此订单");
     }
-    return JSONResult.ok();
+    return JSONResult.ok(order);
   }
 }

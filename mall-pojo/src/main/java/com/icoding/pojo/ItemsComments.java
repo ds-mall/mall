@@ -38,8 +38,8 @@ public class ItemsComments {
     /**
      * 规格名称 可为空
      */
-    @Column(name = "sepc_name")
-    private String sepcName;
+    @Column(name = "spec_name")
+    private String specName;
 
     /**
      * 评价等级 1：好评 2：中评 3：差评
@@ -159,17 +159,17 @@ public class ItemsComments {
      *
      * @return sepc_name - 规格名称 可为空
      */
-    public String getSepcName() {
-        return sepcName;
+    public String getSpecName() {
+        return specName;
     }
 
     /**
      * 设置规格名称 可为空
      *
-     * @param sepcName 规格名称 可为空
+     * @param specName 规格名称 可为空
      */
-    public void setSepcName(String sepcName) {
-        this.sepcName = sepcName;
+    public void setSpecName(String specName) {
+        this.specName = specName;
     }
 
     /**
@@ -242,5 +242,21 @@ public class ItemsComments {
      */
     public void setUpdatedTime(Date updatedTime) {
         this.updatedTime = updatedTime;
+    }
+
+    @Override
+    public String toString() {
+        return "ItemsComments{" +
+                "id='" + id + '\'' +
+                ", userId='" + userId + '\'' +
+                ", itemId='" + itemId + '\'' +
+                ", itemName='" + itemName + '\'' +
+                ", itemSpecId='" + itemSpecId + '\'' +
+                ", specName='" + specName + '\'' +
+                ", commentLevel=" + commentLevel +
+                ", content='" + content + '\'' +
+                ", createdTime=" + createdTime +
+                ", updatedTime=" + updatedTime +
+                '}';
     }
 }

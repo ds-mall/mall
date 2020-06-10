@@ -1,7 +1,7 @@
 package com.icoding.service;
 
-import com.icoding.bo.PayjsNotifyBO;
 import com.icoding.bo.SubmitOrderBO;
+import com.icoding.pojo.OrderItems;
 import com.icoding.pojo.Orders;
 import com.icoding.utils.JSONResult;
 import com.icoding.utils.PagedGridResult;
@@ -62,4 +62,19 @@ public interface OrdersService {
    * @return
    */
   public JSONResult checkOrder(String userId, String orderId);
+
+
+  /**
+   * 根据订单id查询订单包含商品
+   * @param orderId
+   * @return
+   */
+  List<OrderItems> getItemsByOrderId(String orderId);
+
+  /**
+   * 评论成功后修改 订单的is_comment状态为1
+   * @param userId
+   * @param orderId
+   */
+  void setOrderIsCommented(String userId, String orderId);
 }
