@@ -9,6 +9,9 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <!-- war[1] 声明打包方式-->
+    <packaging>war</packaging>
+
     <artifactId>mall-api</artifactId>
 
     <dependencies>
@@ -18,6 +21,7 @@
             <artifactId>mall-service</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+
     </dependencies>
 
 </project>

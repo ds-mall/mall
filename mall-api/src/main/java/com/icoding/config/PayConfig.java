@@ -26,7 +26,7 @@ public class PayConfig {
    * 支付成功回调接口地址
    */
   private static final String WX_NOTIFY_URL_DEV = "http://ueeff6.natappfree.cc/orders/notifyCallbackOnOrderPaid";
-  private static final String WX_NOTIFY_URL_PROD = "http://172.31.87.24:8088/orders/notifyCallbackOnOrderPaid";
+  private static final String WX_NOTIFY_URL_PROD = "http://47.105.41.229:8088/mall-api/orders/notifyCallbackOnOrderPaid";
   /**
    * PAYJS 订单状态查询url
    */

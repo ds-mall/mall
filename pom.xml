@@ -73,6 +73,13 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+        <!-- war[2] 仅在编译和测试阶段使用内置tomcat 运行时使用外部容器tomcat的servlet-api -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
         <!--Aspect-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
