@@ -5,3 +5,9 @@
 #############################################################
 server:
   port: 8088                  # web访问端口 约定为:8088
+
+spring:
+  datasource:                                   # 数据源相关配置
+    url: jdbc:mysql://localhost:3306/mall-dev?characterEncoding=UTF-8&useSSL=false&useUnicode=true&serverTimezone=UTC
+    username: root
+    password: root

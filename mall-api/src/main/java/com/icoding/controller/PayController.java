@@ -2,7 +2,7 @@ package com.icoding.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.icoding.config.WXPayConfig;
+import com.icoding.config.PayConfig;
 import com.icoding.enums.OrderStatusEnum;
 import com.icoding.enums.YesOrNo;
 import com.icoding.mapper.OrderStatusMapper;
@@ -41,7 +41,7 @@ public class PayController {
   private RestTemplate restTemplate;
 
   @Autowired
-  private WXPayConfig wxPayConfig;
+  private PayConfig.WXPayConfig wxPayConfig;
 
   @Autowired
   OrderStatusMapper orderStatusMapper;

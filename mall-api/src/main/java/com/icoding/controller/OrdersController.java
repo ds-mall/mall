@@ -84,7 +84,12 @@ public class OrdersController {
     return HttpStatus.OK.value();
   }
 
-  // 暂时没有后端oms， 所以该接口用于模拟发货
+
+  /**
+   * 暂时没有后端oms， 所以该接口用于模拟发货
+   * @param orderId
+   * @return
+   */
   @ApiOperation(value = "商家发货", notes = "商家发货并修改订单状态为30", httpMethod = "POST")
   @PostMapping("/deliver")
   public JSONResult deliver(@RequestParam("orderId") String orderId) {
