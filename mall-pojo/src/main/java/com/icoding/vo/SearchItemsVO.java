@@ -64,4 +64,15 @@ public class SearchItemsVO {
   public void setPrice(int price) {
     this.price = price;
   }
+
+  @Override
+  public String toString() {
+    return "SearchItemsVO{" +
+            "itemId='" + itemId + '\'' +
+            ", itemName='" + itemName + '\'' +
+            ", sellCounts=" + sellCounts +
+            ", imgUrl='" + imgUrl + '\'' +
+            ", price=" + price +
+            '}';
+  }
 }

@@ -1,6 +1,5 @@
 package com.icoding.service.impl;
 
-import com.icoding.bo.PayjsNotifyBO;
 import com.icoding.bo.SubmitOrderBO;
 import com.icoding.enums.YesOrNo;
 import com.icoding.enums.OrderStatusEnum;
@@ -25,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("ALL")
 @Service
 public class OrdersServiceImpl implements OrdersService {
   private static final Logger LOGGER = LoggerFactory.getLogger(OrdersServiceImpl.class);
@@ -64,7 +64,8 @@ public class OrdersServiceImpl implements OrdersService {
     String lefMsg = submitOrderBO.getLeftMsg();
     String itemSpecIds = submitOrderBO.getItemSpecIds();
     Integer payMethod = submitOrderBO.getPayMethod();
-    Integer postAmount = 0; // 邮费
+    // 邮费
+    Integer postAmount = 0;
     // 查询订单的地址信息
     UserAddress address = addressMapper.selectByPrimaryKey(addressId);
 
@@ -89,8 +90,10 @@ public class OrdersServiceImpl implements OrdersService {
 
     // 2 根据itemSpecIds 保存订单商品信息表
     String[] itemSpecIdArr = itemSpecIds.split(",");
-    int totalAmount = 0; // 商品原价累计
-    int realPayAmount = 0; // 实付金额累计
+    // 商品原价累计
+    int totalAmount = 0;
+    // 实付金额累计
+    int realPayAmount = 0;
     for(String itemSpecId : itemSpecIdArr) {
       // TODO 整合redis后，商品购买的数量重新从redis购物车中获取
       int buyCounts = 1;
@@ -127,7 +130,7 @@ public class OrdersServiceImpl implements OrdersService {
     ordersMapper.insert(newOrder);
     // 3 保存订单状态表
     OrderStatus orderStatus = new OrderStatus();
-    orderStatus.setOrderStatus(OrderStatusEnum.WATI_PAY.getType());
+    orderStatus.setOrderStatus(OrderStatusEnum.WAIT_PAY.getType());
     orderStatus.setOrderId(orderId);
     orderStatus.setCreatedTime(new Date());
     orderStatusMapper.insert(orderStatus);
@@ -170,8 +173,12 @@ public class OrdersServiceImpl implements OrdersService {
   @Transactional(propagation = Propagation.REQUIRED)
   @Override
   public PagedGridResult<UserCenterOrderVO> queryOrdersByStatus(String userId, Integer orderStatus, Integer page, Integer pageSize) {
-    if(page == null) page = 1;
-    if(pageSize == null) pageSize = 20;
+    if(page == null) {
+      page = 1;
+    }
+    if(pageSize == null) {
+      pageSize = 20;
+    }
 
     int start = (page - 1) * pageSize;
     int end = pageSize * page;
@@ -179,7 +186,7 @@ public class OrdersServiceImpl implements OrdersService {
     int totalCounts = ordersMapper.getOrdersCountByStatus(userId, orderStatus);
     int totalPages = totalCounts % pageSize;
 
-    Map<String, Object> queryParams = new HashMap();
+    Map<String, Object> queryParams = new HashMap(4);
     queryParams.put("userId", userId);
     queryParams.put("orderStatus", orderStatus);
     queryParams.put("start", start);
@@ -204,9 +211,6 @@ public class OrdersServiceImpl implements OrdersService {
   @Transactional(propagation = Propagation.REQUIRED)
   @Override
   public void deleteOrder(String userId, String orderId) {
-//    ordersMapper.deleteOrder(userId, orderId);
-//    orderItemMapper.deleteOrderItems(orderId);
-//    orderStatusMapper.deleteOrderStatus(orderId);
     ordersMapper.setOrderDeleted(userId, orderId);
   }
 
@@ -237,7 +241,13 @@ public class OrdersServiceImpl implements OrdersService {
     ordersMapper.setOrderIsCommented(userId, orderId);
   }
 
-  // 用于验证用户和订单是否有关联关系，防止恶意篡改他人订单
+  /**
+   * 用于验证用户和订单是否有关联关系，防止恶意篡改他人订单
+   * @param userId
+   * @param orderId
+   * @return
+   */
+  @Override
   public JSONResult checkOrder(String userId, String orderId) {
     Orders order = queryOrderByUserIdAndOrderId(userId, orderId);
     if(order == null) {
@@ -249,19 +259,19 @@ public class OrdersServiceImpl implements OrdersService {
   @Transactional(propagation = Propagation.SUPPORTS)
   @Override
   public OrderStatusCountVO getOrderStatusCounts(String userId) {
-    Map<String, Object> map = new HashMap<>();
+    Map<String, Object> map = new HashMap<>(4);
     map.put("userId", userId);
 
     // 待支付
-    map.put("orderStatus", OrderStatusEnum.WATI_PAY.getType());
+    map.put("orderStatus", OrderStatusEnum.WAIT_PAY.getType());
     int waitPayCounts = ordersMapper.getMyOrderStatusCounts(map);
 
     // 待发货
-    map.put("orderStatus", OrderStatusEnum.WATI_DELIVER.getType());
+    map.put("orderStatus", OrderStatusEnum.WAIT_DELIVER.getType());
     int waitDeliverCounts = ordersMapper.getMyOrderStatusCounts(map);
 
     // 待收货
-    map.put("orderStatus", OrderStatusEnum.WATI_RECEIVE.getType());
+    map.put("orderStatus", OrderStatusEnum.WAIT_RECEIVE.getType());
     int waitReceiveCounts = ordersMapper.getMyOrderStatusCounts(map);
 
     // 待评论
@@ -281,8 +291,12 @@ public class OrdersServiceImpl implements OrdersService {
   @Transactional(propagation = Propagation.SUPPORTS)
   @Override
   public PagedGridResult getOrdersTrend(String userId, Integer page, Integer pageSize) {
-    if(page == null) page = 1;
-    if(pageSize == null) pageSize = 20;
+    if(page == null) {
+      page = 1;
+    }
+    if(pageSize == null) {
+      pageSize = 20;
+    }
 
     int start = (page - 1) * pageSize;
     int end = pageSize * page;
@@ -290,7 +304,7 @@ public class OrdersServiceImpl implements OrdersService {
     int totalCounts = ordersMapper.getOrderTrendCounts(userId);
     int totalPages = totalCounts % pageSize;
 
-    Map<String, Object> queryParams = new HashMap();
+    Map<String, Object> queryParams = new HashMap(3);
     queryParams.put("userId", userId);
     queryParams.put("start", start);
     queryParams.put("end", end);

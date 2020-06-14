@@ -44,7 +44,7 @@ public class DesensitizationUtil {
                 for (int i = 0; i < SIZE; i++) {
                     stringBuilder.append(SYMBOL);
                 }
-                if ((pamathree == 0 && SIZE / 2 == 0) || (pamathree != 0 && SIZE % 2 != 0)) {
+                if (pamathree != 0 && SIZE % 2 != 0) {
                     stringBuilder.append(value.substring(len - pamafive, len));
                 } else {
                     stringBuilder.append(value.substring(len - (pamafive + 1), len));

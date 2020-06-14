@@ -131,20 +131,25 @@
   </select>
 
   <select id="getOrderTrendCounts" resultType="java.lang.Integer">
-    SELECT count(1) FROM order_status WHERE order_status in (20, 30, 40)
+    SELECT count(1)
+    FROM order_status os
+    LEFT JOIN orders o ON o.id = os.order_id
+    WHERE order_status in (20, 30, 40) AND o.id = #{userId}
   </select>
 
   <select id="getOrderTrendList" resultType="com.icoding.pojo.OrderStatus">
     SELECT
-        order_id as orderId,
-        order_status as orderStatus,
-        created_time as createdTime,
-        pay_time as payTime,
-        deliver_time as deliverTime,
-        success_time as successTime,
-        close_time as closeTime,
-        comment_time as commentTime
-    FROM order_status WHERE order_status in (20, 30, 40)
+        os.order_id as orderId,
+        os.order_status as orderStatus,
+        os.created_time as createdTime,
+        os.pay_time as payTime,
+        os.deliver_time as deliverTime,
+        os.success_time as successTime,
+        os.close_time as closeTime,
+        os.comment_time as commentTime
+    FROM order_status os
+    LEFT JOIN orders o ON o.id = os.order_id
+    WHERE o.user_id = #{queryParams.userId} AND order_status in (20, 30, 40)
     LIMIT #{queryParams.start}, #{queryParams.end}
   </select>
 </mapper>

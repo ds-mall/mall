@@ -47,4 +47,14 @@ public class OrderStatusCountVO {
   public void setWaitCommentCounts(Integer waitCommentCounts) {
     this.waitCommentCounts = waitCommentCounts;
   }
+
+  @Override
+  public String toString() {
+    return "OrderStatusCountVO{" +
+            "waitPayCounts=" + waitPayCounts +
+            ", waitDeliverCounts=" + waitDeliverCounts +
+            ", waitReceiveCounts=" + waitReceiveCounts +
+            ", waitCommentCounts=" + waitCommentCounts +
+            '}';
+  }
 }

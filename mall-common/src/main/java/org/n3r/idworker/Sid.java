@@ -13,12 +13,14 @@ public class Sid {
     private static IdWorker idWorker;
 
     static {
-        configure(DefaultWorkerIdStrategy.instance);
+        configure(DefaultWorkerIdStrategy.INSTANCE);
     }
 
 
     public static synchronized void configure(WorkerIdStrategy custom) {
-        if (workerIdStrategy != null) workerIdStrategy.release();
+        if (workerIdStrategy != null) {
+          workerIdStrategy.release();
+        }
         workerIdStrategy = custom;
         idWorker = new IdWorker(workerIdStrategy.availableWorkerId()) {
             @Override
@@ -51,7 +53,7 @@ public class Sid {
         String yyMMdd = new SimpleDateFormat("yyMMdd").format(new Date());
         return yyMMdd + Utils.padLeft(Utils.encode(id), 10, '0');
     }
-    
+
 //    public static void main(String[] args) {
 //		String aa = new Sid().nextShort();
 //		String bb = new Sid().next();

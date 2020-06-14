@@ -51,4 +51,14 @@ public class ItemInfoVO {
   public void setItemParams(ItemsParam itemParams) {
     this.itemParams = itemParams;
   }
+
+  @Override
+  public String toString() {
+    return "ItemInfoVO{" +
+            "item=" + item +
+            ", itemImgList=" + itemImgList +
+            ", itemSpecList=" + itemSpecList +
+            ", itemParams=" + itemParams +
+            '}';
+  }
 }

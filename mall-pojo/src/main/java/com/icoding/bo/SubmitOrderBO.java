@@ -56,4 +56,15 @@ public class SubmitOrderBO {
   public void setLeftMsg(String leftMsg) {
     this.leftMsg = leftMsg;
   }
+
+  @Override
+  public String toString() {
+    return "SubmitOrderBO{" +
+            "userId='" + userId + '\'' +
+            ", itemSpecIds='" + itemSpecIds + '\'' +
+            ", addressId='" + addressId + '\'' +
+            ", payMethod=" + payMethod +
+            ", leftMsg='" + leftMsg + '\'' +
+            '}';
+  }
 }

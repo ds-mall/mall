@@ -52,4 +52,14 @@ public class ThreeLevelCategoryVO {
   public void setSubFatherId(Integer subFatherId) {
     this.subFatherId = subFatherId;
   }
+
+  @Override
+  public String toString() {
+    return "ThreeLevelCategoryVO{" +
+            "subId=" + subId +
+            ", subName='" + subName + '\'' +
+            ", subType=" + subType +
+            ", subFatherId=" + subFatherId +
+            '}';
+  }
 }

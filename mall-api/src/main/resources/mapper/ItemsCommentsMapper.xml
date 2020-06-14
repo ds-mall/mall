@@ -45,7 +45,7 @@
         u.nickname,
         u.face as userface,
         i.content,
-        i.sepc_name as specName,
+        i.spec_name as specName,
         i.created_time as createdTime
     FROM items_comments i
     LEFT JOIN users u

@@ -35,11 +35,13 @@ public class AddressServiceImpl implements AddressService {
     int isDefault = 0;
     List<UserAddressVO> addressList = this.getAddressList(userAddressBO.getUserId());
     // 如果不存在地址，则当前新增地址设置为默认地址
-    if(addressList.size() == 0) isDefault = 1;
+    if (addressList.size() == 0) {
+      isDefault = 1;
+    }
 
     // 1 BO --> PoJo
     String shotId = sid.nextShort();
-    UserAddress userAddress = userAddressBO.converToPoJo();
+    UserAddress userAddress = userAddressBO.convertToPoJo();
     userAddress.setId(shotId);
     userAddress.setIsDefault(isDefault);
 
@@ -57,7 +59,7 @@ public class AddressServiceImpl implements AddressService {
   @Override
   public void update(UserAddressBO userAddressBO) {
     // 1 BO --> PoJo
-    UserAddress userAddress = userAddressBO.converToPoJo();
+    UserAddress userAddress = userAddressBO.convertToPoJo();
 
     // 2 执行新增
     userAddressMapper.updateAddress(userAddress);

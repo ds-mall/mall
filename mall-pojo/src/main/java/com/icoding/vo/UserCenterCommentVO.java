@@ -64,4 +64,17 @@ public class UserCenterCommentVO {
   public void setItemName(String itemName) {
     this.itemName = itemName;
   }
+
+  @Override
+  public String toString() {
+    return "UserCenterCommentVO{" +
+            "commentId='" + commentId + '\'' +
+            ", content='" + content + '\'' +
+            ", createdTime='" + createdTime + '\'' +
+            ", itemId='" + itemId + '\'' +
+            ", itemName='" + itemName + '\'' +
+            ", specName='" + specName + '\'' +
+            ", url='" + url + '\'' +
+            '}';
+  }
 }

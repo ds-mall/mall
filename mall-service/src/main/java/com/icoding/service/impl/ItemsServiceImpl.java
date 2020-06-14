@@ -106,8 +106,12 @@ public class ItemsServiceImpl implements ItemsService {
   @Transactional(propagation = Propagation.SUPPORTS)
   @Override
   public PagedGridResult<SearchItemsVO> queryItemByKeywords(String keywords, String sort, Integer page, Integer pageSize) {
-    if(page == null) page = 1;
-    if(pageSize == null) pageSize = 20;
+    if(page == null) {
+      page = 1;
+    }
+    if(pageSize == null) {
+      pageSize = 20;
+    }
 
     int start = (page - 1) * pageSize;
     int end = pageSize * page;
@@ -115,7 +119,7 @@ public class ItemsServiceImpl implements ItemsService {
     int totalCounts = itemsMapper.queryItemsCountByKeywords(keywords);
     int totalPages = totalCounts % pageSize;
 
-    Map<String, Object> queryParams = new HashMap();
+    Map<String, Object> queryParams = new HashMap(4);
     queryParams.put("keywords", keywords);
     queryParams.put("sort", sort);
     queryParams.put("start", start);
@@ -133,8 +137,12 @@ public class ItemsServiceImpl implements ItemsService {
 
   @Override
   public PagedGridResult<SearchItemsVO> queryItemByCategoryLevelThree(Integer catId, String sort, Integer page, Integer pageSize) {
-    if(page == null) page = 1;
-    if(pageSize == null) pageSize = 20;
+    if(page == null) {
+      page = 1;
+    }
+    if(pageSize == null) {
+      pageSize = 20;
+    }
 
     int start = (page - 1) * pageSize;
     int end = pageSize * page;
@@ -142,7 +150,7 @@ public class ItemsServiceImpl implements ItemsService {
     int totalCounts = itemsMapper.queryItemsCountByCagegoryLevelThree(catId);
     int totalPages = totalCounts % pageSize;
 
-    Map<String, Object> queryParams = new HashMap();
+    Map<String, Object> queryParams = new HashMap(4);
     queryParams.put("catId", catId);
     queryParams.put("sort", sort);
     queryParams.put("start", start);

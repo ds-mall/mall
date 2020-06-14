@@ -50,7 +50,7 @@ public class OrdersController {
       return JSONResult.errMsg("没有商品信息，订单无法提交");
     }
     Integer payMethod = submitOrderBO.getPayMethod();
-    if(payMethod != PayMethod.WEIXIN.getType() && payMethod != PayMethod.ALIPAY.getType()) {
+    if(!PayMethod.WEIXIN.getType().equals(payMethod) && PayMethod.ALIPAY.getType().equals(payMethod)) {
       return JSONResult.errMsg("支付方式不支持");
     }
     if(StringUtils.isBlank(submitOrderBO.getAddressId())) {
@@ -67,7 +67,6 @@ public class OrdersController {
 
     // 2 创建订单以后，移除购物车中已结算(已提交)的商品
     // TODO 整合redis后，完善购物车中已结算商品的清除，并且同步到前端的cookie
-    // CookieUtils.setCookie(req, rep, "shopCart", "", true);
 
     // 3 向支付中心发送当前订单， 用于保存支付中心的订单数据
     return JSONResult.ok(orderId);
@@ -80,7 +79,7 @@ public class OrdersController {
     LOGGER.info("支付回调携带信息- {}", payjsNotifyBO.toString());
     String orderId = payjsNotifyBO.getOut_trade_no();
     String time = payjsNotifyBO.getTime_end();
-    ordersService.updateOrderStatus(orderId, time, OrderStatusEnum.WATI_DELIVER.getType());
+    ordersService.updateOrderStatus(orderId, time, OrderStatusEnum.WAIT_DELIVER.getType());
     LOGGER.info("***************** 支付回调 end ***************");
     return HttpStatus.OK.value();
   }
@@ -90,7 +89,7 @@ public class OrdersController {
   @PostMapping("/deliver")
   public JSONResult deliver(@RequestParam("orderId") String orderId) {
     LOGGER.info("***************** 商家发货 start ***************");
-    ordersService.updateOrderStatus(orderId, DateUtil.getCurrentDateString(), OrderStatusEnum.WATI_RECEIVE.getType());
+    ordersService.updateOrderStatus(orderId, DateUtil.getCurrentDateString(), OrderStatusEnum.WAIT_RECEIVE.getType());
     LOGGER.info("***************** 商家发货 end ***************");
     return JSONResult.ok("商家发货成功");
   }
@@ -119,7 +118,7 @@ public class OrdersController {
       return result;
     }
     Orders order = (Orders)result.getData();
-    if(order.getIsComment() == YesOrNo.YES.getType()) {
+    if(YesOrNo.YES.getType().equals(order.getIsComment())) {
       return JSONResult.errMsg("该笔订单已完成评价");
     }
 

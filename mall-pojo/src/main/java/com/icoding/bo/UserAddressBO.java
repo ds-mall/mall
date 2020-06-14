@@ -88,11 +88,25 @@ public class UserAddressBO {
     this.detail = detail;
   }
 
+  @Override
+  public String toString() {
+    return "UserAddressBO{" +
+            "addressId='" + addressId + '\'' +
+            ", userId='" + userId + '\'' +
+            ", receiver='" + receiver + '\'' +
+            ", mobile='" + mobile + '\'' +
+            ", province='" + province + '\'' +
+            ", city='" + city + '\'' +
+            ", district='" + district + '\'' +
+            ", detail='" + detail + '\'' +
+            '}';
+  }
+
   /**
    * UserAddressBO 转换为 UserAddress
    * @return
    */
-  public UserAddress converToPoJo() {
+  public UserAddress convertToPoJo() {
     UserAddress userAddress = new UserAddress();
     if(StringUtils.isNotBlank(this.addressId)) {
       // 更新操作 addressId不为空

@@ -7,13 +7,17 @@ public class Id {
     private static IdWorker idWorker;
 
     static {
-        configure(DefaultWorkerIdStrategy.instance);
+        configure(DefaultWorkerIdStrategy.INSTANCE);
     }
 
     public static synchronized void configure(WorkerIdStrategy custom) {
-        if (workerIdStrategy == custom) return;
+        if (workerIdStrategy == custom) {
+          return;
+        }
 
-        if (workerIdStrategy != null) workerIdStrategy.release();
+        if (workerIdStrategy != null) {
+            workerIdStrategy.release();
+        }
         workerIdStrategy = custom;
         workerIdStrategy.initialize();
         idWorker = new IdWorker(workerIdStrategy.availableWorkerId());

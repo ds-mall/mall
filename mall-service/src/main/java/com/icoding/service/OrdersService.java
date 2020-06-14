@@ -63,7 +63,7 @@ public interface OrdersService {
    * @param orderId
    * @return
    */
-  public JSONResult checkOrder(String userId, String orderId);
+  JSONResult checkOrder(String userId, String orderId);
 
 
   /**

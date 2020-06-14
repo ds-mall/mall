@@ -7,7 +7,7 @@ package org.n3r.idworker.utils;
  *         Created on 22/11/12
  */
 public class IPv4Utils {
-
+    private static final Long MAX_IP =  4294967295L;
     /**
      * Returns the long format of the provided IP address.
      *
@@ -43,7 +43,7 @@ public class IPv4Utils {
      */
     public static String toString(long ip) {
         // if ip is bigger than 255.255.255.255 or smaller than 0.0.0.0
-        if (ip > 4294967295l || ip < 0) {
+        if (ip > MAX_IP || ip < 0) {
             throw new IllegalArgumentException("invalid ip");
         }
         StringBuilder ipAddress = new StringBuilder();

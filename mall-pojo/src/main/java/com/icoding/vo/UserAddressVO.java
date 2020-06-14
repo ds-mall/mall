@@ -120,4 +120,19 @@ public class UserAddressVO {
   public void setIsDefault(Integer isDefault) {
     this.isDefault = isDefault;
   }
+
+  @Override
+  public String toString() {
+    return "UserAddressVO{" +
+            "id='" + id + '\'' +
+            ", receiver='" + receiver + '\'' +
+            ", mobile='" + mobile + '\'' +
+            ", province='" + province + '\'' +
+            ", city='" + city + '\'' +
+            ", district='" + district + '\'' +
+            ", detail='" + detail + '\'' +
+            ", extand='" + extand + '\'' +
+            ", isDefault=" + isDefault +
+            '}';
+  }
 }

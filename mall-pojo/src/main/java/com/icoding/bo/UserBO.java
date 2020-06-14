@@ -37,7 +37,16 @@ public class UserBO {
     this.confirmPassword = confirmPassword;
   }
 
-  public Users converToPojo() {
+  @Override
+  public String toString() {
+    return "UserBO{" +
+            "username='" + username + '\'' +
+            ", password='" + password + '\'' +
+            ", confirmPassword='" + confirmPassword + '\'' +
+            '}';
+  }
+
+  public Users convertToPojo() {
     return Users.UsersBuilder.anUsers()
             .withUsername(this.username)
             .withPassword(this.password)

@@ -70,7 +70,19 @@ public class UpdatedUserBO {
     this.sex = sex;
   }
 
-  public Users converToPojo() {
+  @Override
+  public String toString() {
+    return "UpdatedUserBO{" +
+            "nickname='" + nickname + '\'' +
+            ", realname='" + realname + '\'' +
+            ", mobile='" + mobile + '\'' +
+            ", email='" + email + '\'' +
+            ", birthday='" + birthday + '\'' +
+            ", sex=" + sex +
+            '}';
+  }
+
+  public Users convertToPojo() {
     return Users.UsersBuilder.anUsers()
             .withNickname(nickname)
             .withRealname(realname)

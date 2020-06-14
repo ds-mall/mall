@@ -69,4 +69,15 @@ public class SecondLevelCategoryVO {
   public void setSubCatList(List<Category> subCatList) {
     this.subCatList = subCatList;
   }
+
+  @Override
+  public String toString() {
+    return "SecondLevelCategoryVO{" +
+            "id=" + id +
+            ", name='" + name + '\'' +
+            ", type=" + type +
+            ", fatherId=" + fatherId +
+            ", subCatList=" + subCatList +
+            '}';
+  }
 }

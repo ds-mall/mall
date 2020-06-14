@@ -54,10 +54,14 @@ public class UsersServiceImpl implements UsersService {
               .withId(sid.nextShort())
               .withUsername(userBO.getUsername())
               .withPassword(MD5Utils.getMD5Str(userBO.getPassword()))
-              .withNickname(userBO.getUsername()) // 默认用户昵称同用户名
-              .withFace("") // 默认用户头像
-              .withBirthday(DateUtil.stringToDate("1900-01-01")) // 默认生日
-              .withSex(Sex.SECRET.getType()) // 默认性别 保密
+              // 默认用户昵称同用户名
+              .withNickname(userBO.getUsername())
+              // 默认用户头像
+              .withFace("")
+              // 默认生日
+              .withBirthday(DateUtil.stringToDate("1900-01-01"))
+              // 默认性别 保密
+              .withSex(Sex.SECRET.getType())
               .withCreatedTime(new Date())
               .withUpdatedTime(new Date())
               .build();
@@ -103,7 +107,7 @@ public class UsersServiceImpl implements UsersService {
   @Transactional(propagation = Propagation.REQUIRED)
   @Override
   public void updateUserInfo(String userId, UpdatedUserBO updatedUserBO) {
-    Users user = updatedUserBO.converToPojo();
+    Users user = updatedUserBO.convertToPojo();
     user.setId(userId);
     usersMapper.updateUserInfo(user);
   }

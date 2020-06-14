@@ -31,4 +31,13 @@ public class SimpleItemVO {
   public void setItemUrl(String itemUrl) {
     this.itemUrl = itemUrl;
   }
+
+  @Override
+  public String toString() {
+    return "SimpleItemVO{" +
+            "itemId='" + itemId + '\'' +
+            ", itemName='" + itemName + '\'' +
+            ", itemUrl='" + itemUrl + '\'' +
+            '}';
+  }
 }

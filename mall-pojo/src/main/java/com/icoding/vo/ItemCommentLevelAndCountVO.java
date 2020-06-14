@@ -1,7 +1,5 @@
 package com.icoding.vo;
 
-import io.swagger.models.auth.In;
-
 /**
  * 评论等级及对应数量
  */
@@ -60,5 +58,15 @@ public class ItemCommentLevelAndCountVO {
 
   public void setBadCounts(Integer badCounts) {
     this.badCounts = badCounts;
+  }
+
+  @Override
+  public String toString() {
+    return "ItemCommentLevelAndCountVO{" +
+            "totalCounts=" + totalCounts +
+            ", goodCounts=" + goodCounts +
+            ", normalCounts=" + normalCounts +
+            ", badCounts=" + badCounts +
+            '}';
   }
 }

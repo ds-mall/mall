@@ -55,4 +55,16 @@ public class ItemCommentVO {
   public void setCreatedTime(String createdTime) {
     this.createdTime = createdTime;
   }
+
+  @Override
+  public String toString() {
+    return "ItemCommentVO{" +
+            "username='" + username + '\'' +
+            ", nickname='" + nickname + '\'' +
+            ", userface='" + userface + '\'' +
+            ", content='" + content + '\'' +
+            ", specName='" + specName + '\'' +
+            ", createdTime='" + createdTime + '\'' +
+            '}';
+  }
 }

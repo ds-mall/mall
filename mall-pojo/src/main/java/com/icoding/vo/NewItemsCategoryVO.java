@@ -60,4 +60,16 @@ public class NewItemsCategoryVO {
   public void setSimpleItemList(List<SimpleItemVO> simpleItemList) {
     this.simpleItemList = simpleItemList;
   }
+
+  @Override
+  public String toString() {
+    return "NewItemsCategoryVO{" +
+            "rootCatId=" + rootCatId +
+            ", rootCatName='" + rootCatName + '\'' +
+            ", slogan='" + slogan + '\'' +
+            ", catImage='" + catImage + '\'' +
+            ", bgColor='" + bgColor + '\'' +
+            ", simpleItemList=" + simpleItemList +
+            '}';
+  }
 }

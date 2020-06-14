@@ -25,8 +25,12 @@ public class CommentServiceImpl implements CommentService {
 
   @Override
   public PagedGridResult<UserCenterCommentVO> queryCommentsByUserId(String userId, Integer page, Integer pageSize) {
-    if(page == null) page = 1;
-    if(pageSize == null) pageSize = 20;
+    if(page == null) {
+      page = 1;
+    }
+    if(pageSize == null) {
+      pageSize = 20;
+    }
 
     int start = (page - 1) * pageSize;
     int end = pageSize * page;

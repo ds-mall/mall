@@ -81,4 +81,18 @@ public class UserCenterOrderVO {
   public void setSubOrderItemList(List<OrderItems> subOrderItemList) {
     this.subOrderItemList = subOrderItemList;
   }
+
+  @Override
+  public String toString() {
+    return "UserCenterOrderVO{" +
+            "orderId='" + orderId + '\'' +
+            ", orderStatus='" + orderStatus + '\'' +
+            ", realPayAmount=" + realPayAmount +
+            ", postAmount=" + postAmount +
+            ", payMethod=" + payMethod +
+            ", isComment=" + isComment +
+            ", createdTime=" + createdTime +
+            ", subOrderItemList=" + subOrderItemList +
+            '}';
+  }
 }

@@ -67,4 +67,17 @@ public class ShopcartItemVO {
   public void setPriceNormal(String priceNormal) {
     this.priceNormal = priceNormal;
   }
+
+  @Override
+  public String toString() {
+    return "ShopcartItemVO{" +
+            "itemId='" + itemId + '\'' +
+            ", itemImgUrl='" + itemImgUrl + '\'' +
+            ", itemName='" + itemName + '\'' +
+            ", specId='" + specId + '\'' +
+            ", specName='" + specName + '\'' +
+            ", priceDiscount='" + priceDiscount + '\'' +
+            ", priceNormal='" + priceNormal + '\'' +
+            '}';
+  }
 }

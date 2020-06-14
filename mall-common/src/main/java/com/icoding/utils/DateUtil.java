@@ -42,9 +42,9 @@ public class DateUtil {
         return result.toString();
     }
 
-    protected static final float normalizedJulian(float JD) {
+    protected static final float normalizedJulian(float jd) {
 
-        float f = Math.round(JD + 0.5f) - 0.5f;
+        float f = Math.round(jd + 0.5f) - 0.5f;
 
         return f;
     }
@@ -54,10 +54,10 @@ public class DateUtil {
      * such that it matches the nearest half-integer (i.e., a julian date of 1.4 gets
      * changed to 1.5, and 0.9 gets changed to 0.5.)
      *
-     * @param JD the Julian date
+     * @param jd the Julian date
      * @return the Gregorian date
      */
-    public static final Date toDate(float JD) {
+    public static final Date toDate(float jd) {
 
         /* To convert a Julian Day Number to a Gregorian date, assume that it is for 0 hours, Greenwich time (so
          * that it ends in 0.5). Do the following calculations, again dropping the fractional part of all
@@ -65,7 +65,7 @@ public class DateUtil {
          * Gregorian Proleptic Calendar, i.e., the calendar you get by extending the Gregorian
          * calendar backwards to years earlier than 1582. using the Gregorian leap year
          * rules. In particular, the method fails if Y<400. */
-        float Z = (normalizedJulian(JD)) + 0.5f;
+        float Z = (normalizedJulian(jd)) + 0.5f;
         float W = (int) ((Z - 1867216.25f) / 36524.25f);
         float X = (int) (W / 4f);
         float A = Z + 1 + W - X;
@@ -81,7 +81,8 @@ public class DateUtil {
             month = month - 12;
         }
 
-        int year = (int) (C - 4715); //(if Month is January or February) or C-4716 (otherwise)
+        //(if Month is January or February) or C-4716 (otherwise)
+        int year = (int) (C - 4715);
 
         if (month > 2) {
             year--;
@@ -89,7 +90,8 @@ public class DateUtil {
 
         Calendar c = Calendar.getInstance();
         c.set(Calendar.YEAR, year);
-        c.set(Calendar.MONTH, month - 1); // damn 0 offsets
+        // damn 0 offsets
+        c.set(Calendar.MONTH, month - 1);
         c.set(Calendar.DATE, day);
 
         return c.getTime();
@@ -146,9 +148,9 @@ public class DateUtil {
         int C = 2 - A + B;
         float E = (int) (365.25f * (Y + 4716));
         float F = (int) (30.6001f * (M + 1));
-        float JD = C + D + E + F - 1524.5f;
+        float jd = C + D + E + F - 1524.5f;
 
-        return JD;
+        return jd;
     }
 
     /**
@@ -266,7 +268,7 @@ public class DateUtil {
      * @return Timestamp
      */
     public static java.sql.Timestamp getCurrentTimestamp() {
-        return new java.sql.Timestamp(new Date().getTime());
+        return new java.sql.Timestamp(System.currentTimeMillis());
     }
 
     /** java.util.Date
@@ -453,8 +455,8 @@ public class DateUtil {
     public static String getYear(Date date) {
         SimpleDateFormat formater = new SimpleDateFormat(
                 "yyyy");
-        String cur_year = formater.format(date);
-        return cur_year;
+        String curYear = formater.format(date);
+        return curYear;
     }
 
     /**
@@ -465,8 +467,8 @@ public class DateUtil {
     public static String getMonth(Date date) {
         SimpleDateFormat formater = new SimpleDateFormat(
                 "MM");
-        String cur_month = formater.format(date);
-        return cur_month;
+        String curMonth = formater.format(date);
+        return curMonth;
     }
 
     /**
@@ -476,15 +478,15 @@ public class DateUtil {
     public static String getDay(Date date) {
         SimpleDateFormat formater = new SimpleDateFormat(
                 "dd");
-        String cur_day = formater.format(date);
-        return cur_day;
+        String curDay = formater.format(date);
+        return curDay;
     }
 
     public static int getDayInt(Date date) {
         SimpleDateFormat formater = new SimpleDateFormat(
                 "dd");
-        String cur_day = formater.format(date);
-        return Integer.valueOf(cur_day);
+        String curDay = formater.format(date);
+        return Integer.valueOf(curDay);
     }
 
     /**
@@ -494,8 +496,8 @@ public class DateUtil {
     public static String getHour(Date date) {
         SimpleDateFormat formater = new SimpleDateFormat(
                 "HH");
-        String cur_day = formater.format(date);
-        return cur_day;
+        String curDay = formater.format(date);
+        return curDay;
     }
 
     public static int getMinsFromDate(Date dt) {
@@ -640,8 +642,6 @@ public class DateUtil {
 
     public static void main(String[] args)
 	{
-//    	String timeDir=DateUtil.dateToString(new Date(),DateUtil.ISO_EXPANDED_DATE_FORMAT);
-//		System.out.println(timeDir);
     	boolean flag = DateUtil.isValidDate("1990-10-32", DateUtil.ISO_EXPANDED_DATE_FORMAT);
     	System.out.println(flag);
 	}

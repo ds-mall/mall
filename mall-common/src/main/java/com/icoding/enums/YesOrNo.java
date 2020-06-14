@@ -1,7 +1,13 @@
 package com.icoding.enums;
 
 public enum YesOrNo {
+  /**
+   * 1 是
+   */
   YES(1, "是"),
+  /**
+   * 0 否
+   */
   NO(0, "否");
 
   private Integer type;
