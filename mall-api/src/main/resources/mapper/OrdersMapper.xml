@@ -134,7 +134,7 @@
     SELECT count(1)
     FROM order_status os
     LEFT JOIN orders o ON o.id = os.order_id
-    WHERE order_status in (20, 30, 40) AND o.id = #{userId}
+    WHERE order_status in (20, 30, 40) AND o.user_id = #{userId}
   </select>
 
   <select id="getOrderTrendList" resultType="com.icoding.pojo.OrderStatus">
