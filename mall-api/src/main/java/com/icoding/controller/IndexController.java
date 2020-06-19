@@ -8,23 +8,34 @@ import com.icoding.service.CarouselService;
 import com.icoding.service.CategoryService;
 import com.icoding.service.ItemsService;
 import com.icoding.utils.JSONResult;
+import com.icoding.utils.JsonUtils;
+import com.icoding.utils.RedisOperator;
 import com.icoding.vo.NewItemsCategoryVO;
 import com.icoding.vo.SecondLevelCategoryVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+
+import static com.icoding.enums.RedisKey.*;
 
 
 @Api(value = "首页", tags = {"首页展示相关接口"})
 @RestController
 @RequestMapping("/index")
 public class IndexController {
+  private static final Logger LOGGER = LoggerFactory.getLogger(IndexController.class);
 
   @Autowired
   CarouselService carouselService;
@@ -35,11 +46,22 @@ public class IndexController {
   @Autowired
   ItemsService itemsService;
 
+  @Autowired
+  RedisOperator redisOperator;
+
   @ApiOperation(value = "首页轮播图列表接口", notes = "首页轮播图列表", httpMethod = "GET")
   @Transactional(propagation = Propagation.SUPPORTS)
   @GetMapping("/carousel")
   public JSONResult queryAllCarousel() {
-    List<Carousel> carousels = carouselService.queryAll(YesOrNo.YES.getType());
+    List<Carousel> carousels;
+    String carouselStr = redisOperator.get(CAROUSELS.getKey());
+    if (StringUtils.isNotBlank(carouselStr)) {
+      LOGGER.info("redis key carousels, values {}", carouselStr);
+      carousels = JsonUtils.jsonToList(carouselStr, Carousel.class);
+    } else {
+      carousels = carouselService.queryAll(YesOrNo.YES.getType());
+      redisOperator.set(CAROUSELS.getKey(), JsonUtils.objectToJson(carousels));
+    }
     return JSONResult.ok(carousels);
   }
 
@@ -52,7 +74,15 @@ public class IndexController {
   @Transactional(propagation = Propagation.SUPPORTS)
   @GetMapping("/cats")
   public JSONResult queryCategory() {
-    List<Category> categories = categoryService.queryCategoryByType(CategoryType.ONE.getType());
+    List<Category> categories;
+    String categoryStr = redisOperator.get(CATEGORIES.getKey());
+    if(StringUtils.isNotBlank(categoryStr)) {
+      LOGGER.info("redis key {}， values {}", CATEGORIES.getKey(), categoryStr);
+      categories = JsonUtils.jsonToList(categoryStr, Category.class);
+    } else {
+      categories = categoryService.queryCategoryByType(CategoryType.ONE.getType());
+      redisOperator.set(CATEGORIES.getKey(), JsonUtils.objectToJson(categories));
+    }
     return JSONResult.ok(categories);
   }
 
@@ -65,7 +95,17 @@ public class IndexController {
     if(rootCatId == null) {
       return JSONResult.errMsg("分类不存在");
     }
-    List<SecondLevelCategoryVO> subCategories = categoryService.queryCategoryByFatherId(rootCatId);
+    List<SecondLevelCategoryVO> subCategories;
+    String key = SUBCATEGORIES.getKey();
+    String field = rootCatId.toString();
+
+    String subCategoriesStr = redisOperator.hget(key, field);
+    if(StringUtils.isNotBlank(subCategoriesStr)) {
+      subCategories = JsonUtils.jsonToList(subCategoriesStr, SecondLevelCategoryVO.class);
+    } else {
+      subCategories = categoryService.queryCategoryByFatherId(rootCatId);
+      redisOperator.hset(key, field, JsonUtils.objectToJson(subCategories));
+    }
     return JSONResult.ok(subCategories);
   }
 
