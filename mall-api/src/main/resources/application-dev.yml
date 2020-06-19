@@ -11,3 +11,7 @@ spring:
     url: jdbc:mysql://localhost:3306/mall-dev?characterEncoding=UTF-8&useSSL=false&useUnicode=true&serverTimezone=UTC
     username: root
     password: root
+  redis:
+    database: 1
+    host: 127.0.0.1
+    port: 6379
