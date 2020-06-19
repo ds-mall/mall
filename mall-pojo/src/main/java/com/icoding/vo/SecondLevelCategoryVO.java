@@ -1,7 +1,5 @@
 package com.icoding.vo;
 
-import com.icoding.pojo.Category;
-
 import java.util.List;
 
 /**
@@ -28,7 +26,7 @@ public class SecondLevelCategoryVO {
   /**
    * 二级分类下属三级分类列表
    */
-  List<Category> subCatList;
+  List<ThreeLevelCategoryVO> subCatList;
 
   public Integer getId() {
     return id;
@@ -62,11 +60,11 @@ public class SecondLevelCategoryVO {
     this.fatherId = fatherId;
   }
 
-  public List<Category> getSubCatList() {
+  public List<ThreeLevelCategoryVO> getSubCatList() {
     return subCatList;
   }
 
-  public void setSubCatList(List<Category> subCatList) {
+  public void setSubCatList(List<ThreeLevelCategoryVO> subCatList) {
     this.subCatList = subCatList;
   }
 
