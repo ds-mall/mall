@@ -1,14 +1,16 @@
 package com.icoding.service.impl;
 
+import com.icoding.bo.ShopcartItemBO;
 import com.icoding.bo.SubmitOrderBO;
-import com.icoding.enums.YesOrNo;
 import com.icoding.enums.OrderStatusEnum;
+import com.icoding.enums.YesOrNo;
 import com.icoding.mapper.*;
 import com.icoding.pojo.*;
 import com.icoding.service.ItemsService;
 import com.icoding.service.OrdersService;
 import com.icoding.utils.JSONResult;
 import com.icoding.utils.PagedGridResult;
+import com.icoding.utils.RedisOperator;
 import com.icoding.vo.OrderStatusCountVO;
 import com.icoding.vo.UserCenterOrderVO;
 import org.n3r.idworker.Sid;
@@ -19,10 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @SuppressWarnings("ALL")
 @Service
@@ -56,9 +55,12 @@ public class OrdersServiceImpl implements OrdersService {
   @Autowired
   OrderStatusMapper orderStatusMapper;
 
+  @Autowired
+  RedisOperator redisOperator;
+
   @Transactional(propagation = Propagation.REQUIRED)
   @Override
-  public String createOrder(SubmitOrderBO submitOrderBO) {
+  public JSONResult createOrder(List<ShopcartItemBO> shopcartItems, SubmitOrderBO submitOrderBO) {
     String userId = submitOrderBO.getUserId();
     String addressId = submitOrderBO.getAddressId();
     String lefMsg = submitOrderBO.getLeftMsg();
@@ -94,9 +96,21 @@ public class OrdersServiceImpl implements OrdersService {
     int totalAmount = 0;
     // 实付金额累计
     int realPayAmount = 0;
+
     for(String itemSpecId : itemSpecIdArr) {
-      // TODO 整合redis后，商品购买的数量重新从redis购物车中获取
-      int buyCounts = 1;
+      // 整合redis后，商品购买的数量重新从redis购物车中获取
+      int buyCounts = 0;
+
+      Optional<ShopcartItemBO> first = shopcartItems.stream().filter(item -> {
+        return item.getSpecId().equals(itemSpecId);
+      }).findFirst();
+
+      if(first.isPresent()) {
+        buyCounts = first.get().getBuyCounts();
+      } else {
+        return JSONResult.errMsg("购物车中不包含商品：" + itemSpecId);
+      }
+
       // 2.1 根据规格id查询 查询规格的具体信息，主要获取价格
       ItemsSpec itemsSpec = itemsSpecMapper.selectByPrimaryKey(itemSpecId);
       totalAmount += itemsSpec.getPriceNormal() * buyCounts;
@@ -124,10 +138,13 @@ public class OrdersServiceImpl implements OrdersService {
       // 2.5 在用户提交订单以后， 需要扣减库存
       itemsService.decreaseItemSpecStock(itemSpecId, buyCounts);
     }
+
+    // 1.1 订单表需要计算该笔订单的总金额和实际支付金额 才能入库，需要迭代订单涉及的所有商品规格
     newOrder.setTotalAmount(totalAmount);
     newOrder.setRealPayAmount(realPayAmount);
-    // 订单数据 入库
+    // 1.2 订单数据 入库
     ordersMapper.insert(newOrder);
+
     // 3 保存订单状态表
     OrderStatus orderStatus = new OrderStatus();
     orderStatus.setOrderStatus(OrderStatusEnum.WAIT_PAY.getType());
@@ -135,7 +152,7 @@ public class OrdersServiceImpl implements OrdersService {
     orderStatus.setCreatedTime(new Date());
     orderStatusMapper.insert(orderStatus);
 
-    return orderId;
+    return JSONResult.ok(orderId);
   }
 
   /**

@@ -1,6 +1,7 @@
 package com.icoding.controller;
 
 import com.icoding.bo.PayjsNotifyBO;
+import com.icoding.bo.ShopcartItemBO;
 import com.icoding.bo.SubmitOrderBO;
 import com.icoding.enums.OrderStatusEnum;
 import com.icoding.enums.PayMethod;
@@ -9,8 +10,7 @@ import com.icoding.pojo.OrderItems;
 import com.icoding.pojo.Orders;
 import com.icoding.service.AddressService;
 import com.icoding.service.OrdersService;
-import com.icoding.utils.DateUtil;
-import com.icoding.utils.JSONResult;
+import com.icoding.utils.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -24,6 +24,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static com.icoding.enums.RedisKey.SHOPCART;
 
 
 @Api(value = "订单", tags = {"订单模块相关接口"})
@@ -37,6 +41,9 @@ public class OrdersController {
 
   @Autowired
   OrdersService ordersService;
+
+  @Autowired
+  RedisOperator redisOperator;
 
   @ApiOperation(value = "创建订单", notes = "创建订单", httpMethod = "POST")
   @PostMapping("/create")
@@ -57,19 +64,29 @@ public class OrdersController {
       return JSONResult.errMsg("收货地址为空");
     }
 
-    // 1 创建订单
-    String orderId = "";
-    try {
-      orderId = ordersService.createOrder(submitOrderBO);
-    } catch(Exception e) {
-      return JSONResult.errMsg(e.getMessage());
+    String userId = submitOrderBO.getUserId();
+    String shopcartJson = redisOperator.get(SHOPCART.getKey() + ":" + userId);
+    if(StringUtils.isBlank(shopcartJson)) {
+      return JSONResult.errMsg("购物车数据不正确");
     }
+    // redis中的购物车数据
+    List<ShopcartItemBO> shopcartItems = JsonUtils.jsonToList(shopcartJson, ShopcartItemBO.class);
+
+    // 1 创建订单
+    JSONResult result = ordersService.createOrder(shopcartItems, submitOrderBO);
 
     // 2 创建订单以后，移除购物车中已结算(已提交)的商品
-    // TODO 整合redis后，完善购物车中已结算商品的清除，并且同步到前端的cookie
+    // 整合redis后，完善购物车中已结算商品的清除，并且同步到前端的cookie
+    if(result.getStatus().equals(HttpStatus.OK.value())) {
+      List<ShopcartItemBO> newShopcartItems = shopcartItems.stream().filter(item -> Stream.of(submitOrderBO.getItemSpecIds().split(","))
+              .anyMatch(itemSpecId -> !itemSpecId.equals(item.getSpecId()))).collect(Collectors.toList());
 
-    // 3 向支付中心发送当前订单， 用于保存支付中心的订单数据
-    return JSONResult.ok(orderId);
+      redisOperator.set(SHOPCART.getKey() + ":" + userId, JsonUtils.objectToJson(newShopcartItems));
+      CookieUtils.setCookie(req, rep, SHOPCART.getKey(), JsonUtils.objectToJson(newShopcartItems), true);
+    }
+
+
+    return result;
   }
 
   @ApiOperation(value = "接收微信支付异步通知的回调地址", notes = "接收微信支付异步通知的回调地址", httpMethod = "POST")
