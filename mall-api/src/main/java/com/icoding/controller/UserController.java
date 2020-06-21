@@ -1,12 +1,10 @@
 package com.icoding.controller;
 
+import com.icoding.bo.ShopcartItemBO;
 import com.icoding.bo.UserBO;
 import com.icoding.pojo.Users;
 import com.icoding.service.UsersService;
-import com.icoding.utils.CookieUtils;
-import com.icoding.utils.JSONResult;
-import com.icoding.utils.JsonUtils;
-import com.icoding.utils.MD5Utils;
+import com.icoding.utils.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
@@ -18,6 +16,10 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.icoding.enums.RedisKey.SHOPCART;
 
 @Api(value = "注册登录", tags = {"用于注册登录的相关接口"})
 @RestController
@@ -27,6 +29,9 @@ public class UserController {
 
   @Autowired
   private UsersService usersService;
+
+  @Autowired
+  private RedisOperator redisOperator;
 
   @ApiIgnore
   @GetMapping("/{id}")
@@ -90,7 +95,9 @@ public class UserController {
     // 6 设置cookie
     CookieUtils.setCookie(req, rep, "user", JsonUtils.objectToJson(user), true);
     // TODO 生成用户token, 存入redis中
-    // TODO 同步购物车数据(多端数据同步)
+    // 同步购物车数据(多端数据同步)
+    synchShopcartData(req, rep, user);
+
     return JSONResult.ok(user);
   }
 
@@ -118,7 +125,9 @@ public class UserController {
     // 4 设置cookie
     CookieUtils.setCookie(req, rep, "user", JsonUtils.objectToJson(user), true);
     // TODO 生成用户token, 存入redis中
-    // TODO 同步购物车数据(多端数据同步)
+    // 同步购物车数据(多端数据同步)
+    synchShopcartData(req, rep, user);
+
     // 5 返回登录信息
     return JSONResult.ok(user);
   }
@@ -129,8 +138,74 @@ public class UserController {
     // 删除cookie
     CookieUtils.deleteCookie(req, rep, "user");
 
-    // TODO 用户退出登录，清空购物车
+    // 用户退出登录，清空购物车
+    CookieUtils.deleteCookie(req, rep, SHOPCART.getKey());
     // TODO 分布式会话中需要清除用户数据
     return JSONResult.ok();
+  }
+
+
+  /**
+   * 注册成功和登录成功后需要同步cookie和redis中的购物车数据
+   */
+  private void synchShopcartData(HttpServletRequest req, HttpServletResponse rep, Users user) {
+    /**
+     * 1. redis中没数据，如果cookie中的购物车为空，那么这个时候不做任何处理
+     *                 如果cookie中的购物车不为空，直接放入购物车中
+     *
+     * 2. redis中有数据，如果cookie中的购物车为空，直接把redis的购物车覆盖到本地cookie
+     *                 如果cookie中的购物车不为空，以前端cookie数据为准
+     *
+     * 3. 同步到redis后，覆盖本地cookie购物车中的数据，保证本地购物车中数据是同步的
+     */
+
+    // cookie中的数据
+    String shopcartCookieStr = CookieUtils.getCookieValue(req, SHOPCART.getKey(), true);
+
+    // redis中的数据
+    String key = SHOPCART.getKey() + ":" + user.getId();
+    String shopcartRedisStr = redisOperator.get(key);
+
+    if(StringUtils.isBlank(shopcartRedisStr)) {
+      // redis为空，cookie不为空，直接把cookie放入redis中
+      if(StringUtils.isNotBlank(shopcartCookieStr)) {
+        redisOperator.set(key, shopcartCookieStr);
+      }
+    } else {
+      // redis不为空, cookie为空，直接把redis放入cookie中
+      if(StringUtils.isBlank(shopcartCookieStr)) {
+        CookieUtils.setCookie(req, rep, SHOPCART.getKey(), shopcartRedisStr, true);
+      } else {
+        //  redis不为空，cookie不为空，合并cookie和redis中的数据(重复商品则以cookie为主，覆盖redis)
+        List<ShopcartItemBO> shopcartCookieItems = JsonUtils.jsonToList(shopcartCookieStr, ShopcartItemBO.class);
+        List<ShopcartItemBO> shopcartRedisItems = JsonUtils.jsonToList(shopcartRedisStr, ShopcartItemBO.class);
+
+        // 存放redis和cookie中重合的商品，后续待删除
+        List<ShopcartItemBO> pendingDeleteList = new ArrayList<>();
+        for(ShopcartItemBO redisItem : shopcartRedisItems) {
+          String redisItemSpecId = redisItem.getSpecId();
+          for(ShopcartItemBO cookieItem : shopcartCookieItems) {
+            String cookieItemSpecId = cookieItem.getSpecId();
+            if(redisItemSpecId.equals(cookieItemSpecId)) {
+              // cookie与redis中包含重复商品, 以cookie中的商品数量为主
+              redisItem.setBuyCounts(cookieItem.getBuyCounts());
+              // 放入待删除列表中
+              pendingDeleteList.add(cookieItem);
+            }
+          }
+        }
+
+        // 从cookie中删除重合的商品
+        shopcartCookieItems.removeAll(pendingDeleteList);
+
+        // 合并redis和cookie
+        shopcartRedisItems.addAll(shopcartCookieItems);
+
+        // 更新redis数据和cookie数据
+        String newRedisShopcartItemsStr = JsonUtils.objectToJson(shopcartRedisItems);
+        redisOperator.set(key, newRedisShopcartItemsStr);
+        CookieUtils.setCookie(req, rep, SHOPCART.getKey(), newRedisShopcartItemsStr, true);
+      }
+    }
   }
 }

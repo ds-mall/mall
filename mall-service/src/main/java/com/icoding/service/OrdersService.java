@@ -1,5 +1,6 @@
 package com.icoding.service;
 
+import com.icoding.bo.ShopcartItemBO;
 import com.icoding.bo.SubmitOrderBO;
 import com.icoding.pojo.OrderItems;
 import com.icoding.pojo.Orders;
@@ -9,15 +10,15 @@ import com.icoding.vo.OrderStatusCountVO;
 import com.icoding.vo.UserCenterOrderVO;
 
 import java.util.List;
-import java.util.Map;
 
 public interface OrdersService {
   /**
    * 提交订单
+   * @param shopcartItems redis中的购物车数量
    * @param submitOrderBO
    * @return
    */
-  String createOrder(SubmitOrderBO submitOrderBO);
+  JSONResult createOrder(List<ShopcartItemBO> shopcartItems, SubmitOrderBO submitOrderBO);
 
   /**
    * 更新订单状态

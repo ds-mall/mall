@@ -17,6 +17,10 @@ public enum RedisKey {
    * 子分类(hash)
    */
   SUBCATEGORIES("subCategories"),
+  /**
+   * 用户购物车 shopcart:userId
+   */
+  SHOPCART("shopcart"),
   ;
 
   private String key;
