@@ -18,7 +18,7 @@ server:
 #############################################################
 spring:
   profiles:
-    active: prod # 激活环境
+    active: dev # 激活环境
   datasource:                                   # 数据源相关配置
     type: com.zaxxer.hikari.HikariDataSource    # 数据源类型: HikariCP
     driver-class-name: com.mysql.jdbc.Driver    # mysql驱动
