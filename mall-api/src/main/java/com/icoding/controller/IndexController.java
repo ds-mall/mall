@@ -104,7 +104,20 @@ public class IndexController {
       subCategories = JsonUtils.jsonToList(subCategoriesStr, SecondLevelCategoryVO.class);
     } else {
       subCategories = categoryService.queryCategoryByFatherId(rootCatId);
-      redisOperator.hset(key, field, JsonUtils.objectToJson(subCategories));
+
+      if (subCategories != null && subCategories.size() > 0) {
+        redisOperator.hset(key, field, JsonUtils.objectToJson(subCategories));
+      } else {
+        /**
+         * 查询的key在redis中不存在
+         * 对应的id在数据库中也不存在
+         * 此时被非法用户进行攻击，大量的请求会直接打在db上，造成宕机，从而影响整个系统
+         * 这种现象称为: 缓存穿透
+         *
+         * 解决方案: 把空的数据也缓存起来， 比如空字符串，空对象，空数组或list
+          */
+        redisOperator.hset(key, field, JsonUtils.objectToJson(subCategories), 5 * 60);
+      }
     }
     return JSONResult.ok(subCategories);
   }
