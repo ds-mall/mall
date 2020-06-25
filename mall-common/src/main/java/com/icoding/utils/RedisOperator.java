@@ -151,6 +151,19 @@ public class RedisOperator {
    */
   public void hset(String key, String field, Object value) {
     redisTemplate.opsForHash().put(key, field, value);
+    redisTemplate.expire(key, 5 * 60, TimeUnit.SECONDS);
+  }
+
+  /**
+   * 实现命令：HSET key field value，将哈希表 key中的域 field的值设为 value, 过期时间为 expire， 单位为秒
+   *
+   * @param key
+   * @param field
+   * @param value
+   */
+  public void hset(String key, String field, Object value, long expire) {
+    redisTemplate.opsForHash().put(key, field, value);
+    redisTemplate.expire(key, expire, TimeUnit.SECONDS);
   }
 
   /**
