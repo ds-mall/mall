@@ -31,7 +31,8 @@ public class CorsConfig {
     return webMvcConfigurer;
   }
 
-  @Bean("webMvcConfigurer")
+  // 生产环境使用nginx 反向代理实现跨域 不需要此配置
+/*  @Bean("webMvcConfigurer")
   @Profile("prod")
   public WebMvcConfigurer corsConfigurerProd() {
     WebMvcConfigurer webMvcConfigurer = new WebMvcConfigurer() {
@@ -48,6 +49,6 @@ public class CorsConfig {
       }
     };
     return webMvcConfigurer;
-  }
+  }*/
 }
 
