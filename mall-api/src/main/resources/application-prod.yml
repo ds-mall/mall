@@ -12,3 +12,8 @@ spring:
     url: jdbc:mysql://47.105.41.229:3306/mall-dev?characterEncoding=UTF-8&useSSL=false&useUnicode=true&serverTimezone=UTC
     username: admin
     password: admin
+  redis:
+    database: 1
+    ############# 单机模式 ############
+    host: 47.105.41.229
+    port: 6379
