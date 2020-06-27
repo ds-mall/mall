@@ -23,9 +23,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.icoding.enums.RedisKey.SHOPCART;
 
@@ -78,11 +77,20 @@ public class OrdersController {
     // 2 创建订单以后，移除购物车中已结算(已提交)的商品
     // 整合redis后，完善购物车中已结算商品的清除，并且同步到前端的cookie
     if(result.getStatus().equals(HttpStatus.OK.value())) {
-      List<ShopcartItemBO> newShopcartItems = shopcartItems.stream().filter(item -> Stream.of(submitOrderBO.getItemSpecIds().split(","))
-              .anyMatch(itemSpecId -> !itemSpecId.equals(item.getSpecId()))).collect(Collectors.toList());
+      // 待删除购物车商品
+      List<ShopcartItemBO> waitDeleteShopcartItems = new ArrayList<>();
 
-      redisOperator.set(SHOPCART.getKey() + ":" + userId, JsonUtils.objectToJson(newShopcartItems));
-      CookieUtils.setCookie(req, rep, SHOPCART.getKey(), JsonUtils.objectToJson(newShopcartItems), true);
+      for(String itemSpecId : submitOrderBO.getItemSpecIds().split(",")) {
+        for(ShopcartItemBO item : shopcartItems) {
+          if(item.getSpecId().equals(itemSpecId)) {
+            waitDeleteShopcartItems.add(item);
+          }
+        }
+      }
+      shopcartItems.removeAll(waitDeleteShopcartItems);
+
+      redisOperator.set(SHOPCART.getKey() + ":" + userId, JsonUtils.objectToJson(shopcartItems));
+      CookieUtils.setCookie(req, rep, SHOPCART.getKey(), JsonUtils.objectToJson(shopcartItems), true);
     }
 
 
