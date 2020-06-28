@@ -2,14 +2,17 @@ package com.icoding.controller;
 
 import com.icoding.bo.ShopcartItemBO;
 import com.icoding.bo.UserBO;
+import com.icoding.enums.RedisKey;
 import com.icoding.pojo.Users;
 import com.icoding.service.UsersService;
 import com.icoding.utils.*;
+import com.icoding.vo.UsersVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -18,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static com.icoding.enums.RedisKey.SHOPCART;
 
@@ -89,16 +93,32 @@ public class UserController {
     // 4 执行注册
     Users user = usersService.createUser(userBO);
 
-    // 5 屏蔽隐私信息
-    Users.setNullProperty(user);
+    // 5 生成usersVO 并保存用户会话到redis中
+    UsersVO usersVO = convertToUsersVO(user);
 
     // 6 设置cookie
-    CookieUtils.setCookie(req, rep, "user", JsonUtils.objectToJson(user), true);
-    // TODO 生成用户token, 存入redis中
-    // 同步购物车数据(多端数据同步)
-    synchShopcartData(req, rep, user);
+    CookieUtils.setCookie(req, rep, "user", JsonUtils.objectToJson(usersVO), true);
 
-    return JSONResult.ok(user);
+    // 同步购物车数据(多端数据同步)
+    synchShopcartData(req, rep, usersVO.getId());
+
+    return JSONResult.ok(usersVO);
+  }
+
+  /**
+   * 根据Users生成UsersVO, 并保存用户会话token到redis中
+   * @param user
+   * @return
+   */
+  private UsersVO convertToUsersVO(Users user) {
+    // 生成用户token, 存入redis中
+    String uniqueToken = UUID.randomUUID().toString().trim();
+    redisOperator.set(RedisKey.USERTOKEN.getKey() + ":" + user.getId(), uniqueToken);
+
+    UsersVO usersVO = new UsersVO();
+    BeanUtils.copyProperties(user, usersVO);
+    usersVO.setUserToken(uniqueToken);
+    return usersVO;
   }
 
   @ApiOperation(value = "用户登录", notes = "用户登录", httpMethod = "POST")
@@ -119,28 +139,32 @@ public class UserController {
     if(user == null) {
       return JSONResult.errMsg("用户名或密码错误");
     }
-    // 3 屏蔽隐私信息
-    Users.setNullProperty(user);
+
+    // 生成用户token, 存入redis中
+    UsersVO usersVO = convertToUsersVO(user);
 
     // 4 设置cookie
-    CookieUtils.setCookie(req, rep, "user", JsonUtils.objectToJson(user), true);
-    // TODO 生成用户token, 存入redis中
+    CookieUtils.setCookie(req, rep, "user", JsonUtils.objectToJson(usersVO), true);
+
     // 同步购物车数据(多端数据同步)
-    synchShopcartData(req, rep, user);
+    synchShopcartData(req, rep, usersVO.getId());
 
     // 5 返回登录信息
-    return JSONResult.ok(user);
+    return JSONResult.ok(usersVO);
   }
 
   @ApiOperation(value = "用户退出登录", notes = "用户退出登录", httpMethod = "GET")
   @GetMapping("/logout")
   public JSONResult logout(@RequestParam String userId, HttpServletRequest req, HttpServletResponse rep) {
-    // 删除cookie
+    // 用户退出登录，清空user信息
     CookieUtils.deleteCookie(req, rep, "user");
 
     // 用户退出登录，清空购物车
     CookieUtils.deleteCookie(req, rep, SHOPCART.getKey());
-    // TODO 分布式会话中需要清除用户数据
+
+    // 分布式会话中需要清除用户数据
+    redisOperator.del(RedisKey.USERTOKEN.getKey() + ":" + userId);
+
     return JSONResult.ok();
   }
 
@@ -148,7 +172,7 @@ public class UserController {
   /**
    * 注册成功和登录成功后需要同步cookie和redis中的购物车数据
    */
-  private void synchShopcartData(HttpServletRequest req, HttpServletResponse rep, Users user) {
+  private void synchShopcartData(HttpServletRequest req, HttpServletResponse rep, String userId) {
     /**
      * 1. redis中没数据，如果cookie中的购物车为空，那么这个时候不做任何处理
      *                 如果cookie中的购物车不为空，直接放入购物车中
@@ -163,7 +187,7 @@ public class UserController {
     String shopcartCookieStr = CookieUtils.getCookieValue(req, SHOPCART.getKey(), true);
 
     // redis中的数据
-    String key = SHOPCART.getKey() + ":" + user.getId();
+    String key = SHOPCART.getKey() + ":" + userId;
     String shopcartRedisStr = redisOperator.get(key);
 
     if(StringUtils.isBlank(shopcartRedisStr)) {

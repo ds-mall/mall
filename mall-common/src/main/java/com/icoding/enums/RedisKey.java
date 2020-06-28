@@ -21,6 +21,10 @@ public enum RedisKey {
    * 用户购物车 shopcart:userId
    */
   SHOPCART("shopcart"),
+  /**
+   * 用户token userToken:userId
+   */
+  USERTOKEN("userToken"),
   ;
 
   private String key;

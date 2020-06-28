@@ -7,30 +7,29 @@ import com.aliyun.oss.OSSException;
 import com.aliyun.oss.model.PutObjectRequest;
 import com.icoding.bo.UpdatedUserBO;
 import com.icoding.config.AliyunOssConfig;
-import com.icoding.enums.YesOrNo;
-import com.icoding.pojo.OrderItems;
+import com.icoding.enums.RedisKey;
 import com.icoding.pojo.OrderStatus;
-import com.icoding.pojo.Orders;
 import com.icoding.pojo.Users;
 import com.icoding.service.OrdersService;
 import com.icoding.service.UsersService;
-import com.icoding.utils.JSONResult;
-import com.icoding.utils.PagedGridResult;
-import com.icoding.utils.ValidateUtils;
+import com.icoding.utils.*;
 import com.icoding.vo.OrderStatusCountVO;
 import com.icoding.vo.UserCenterOrderVO;
+import com.icoding.vo.UsersVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.List;
 
 @Api(value = "用户中心", tags = {"用户中心相关接口"})
 @RestController
@@ -45,6 +44,9 @@ public class UserCenterController {
 
   @Autowired
   AliyunOssConfig aliyunOssConfig;
+
+  @Autowired
+  RedisOperator redisOperator;
 
   @ApiOperation(value = "获取用户信息", notes = "获取用户信息", httpMethod = "GET")
   @GetMapping("/statusCounts")
@@ -78,6 +80,8 @@ public class UserCenterController {
   @ApiOperation(value = "修改用户信息", notes = "修改用户信息", httpMethod = "PUT")
   @PutMapping("/userInfo")
   public JSONResult updateUserInfo(
+          HttpServletRequest req,
+          HttpServletResponse rep,
           @ApiParam(name = "userId", value = "用户id", required = true)
           @RequestParam("userId") String userId,
           @ApiParam(name = "更新后用户信息", value = "updated userInfo", required = true)
@@ -89,6 +93,10 @@ public class UserCenterController {
     JSONResult result = checkUpdatedUserInfo(updatedUserBO);
     if(result.getStatus() == 200) {
       usersService.updateUserInfo(userId, updatedUserBO);
+
+      // 更新cookie中的user信息
+      updateUserCookie(req, rep, userId);
+
       return JSONResult.ok("更新成功");
     } else {
       return result;
@@ -98,6 +106,8 @@ public class UserCenterController {
   @ApiOperation(value = "上传用户头像", notes = "上传用户头像", httpMethod = "POST")
   @PostMapping("/userface")
   public JSONResult updateUserFace(
+          HttpServletRequest req,
+          HttpServletResponse rep,
           @ApiParam(name = "userId", value = "用户id", required = true)
           @RequestParam("userId") String userId,
           @ApiParam(name = "头像文件", value = "头像文件", required = true)
@@ -136,7 +146,21 @@ public class UserCenterController {
     String faceUrl = aliyunOssConfig.getBucketName() + "." + aliyunOssConfig.getEndpoint() + "/" + uploadFileName;
     // 4 更新用户数据库的头像
     usersService.updateUserFace(userId, faceUrl);
+
+    // 5 更新cookie中的user信息
+    updateUserCookie(req, rep, userId);
+
     return JSONResult.ok("头像上传成功");
+  }
+
+  private void updateUserCookie(HttpServletRequest req, HttpServletResponse rep, @RequestParam("userId") @ApiParam(name = "userId", value = "用户id", required = true) String userId) {
+    // 5 更新cookie
+    String token = redisOperator.get(RedisKey.USERTOKEN.getKey() + ":" + userId);
+    Users user = usersService.queryUserInfo(userId);
+    UsersVO usersVO = new UsersVO();
+    BeanUtils.copyProperties(user, usersVO);
+    usersVO.setUserToken(token);
+    CookieUtils.setCookie(req, rep, "user", JsonUtils.objectToJson(usersVO), true);
   }
 
 
@@ -207,7 +231,8 @@ public class UserCenterController {
     if(StringUtils.isNotBlank(mobile) && mobile.length() != 11) {
       return JSONResult.errMsg("手机长度不是11位");
     }
-    if(!ValidateUtils.checkMobileIsOk(mobile)) {
+
+    if(StringUtils.isNotBlank(mobile) && !ValidateUtils.checkMobileIsOk(mobile)) {
       return JSONResult.errMsg("请输入有效的手机号");
     }
 
