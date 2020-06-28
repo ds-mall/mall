@@ -38,13 +38,13 @@ public class UserController {
   private RedisOperator redisOperator;
 
   @ApiIgnore
-  @GetMapping("/{id}")
-  public Users getUserById(@PathVariable("id") int id) {
+  @GetMapping("/hello")
+  public String hello() {
     LOGGER.debug("hello world ====>");
     LOGGER.info("hello world ====>");
     LOGGER.warn("hello world ====>");
     LOGGER.error("hello world ====>");
-    return usersService.getUsersById(id);
+    return "hello";
   }
 
   @ApiOperation(value = "用户名是否存在", notes = "用户名是否存在", httpMethod = "GET")
