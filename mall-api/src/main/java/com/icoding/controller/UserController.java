@@ -117,7 +117,7 @@ public class UserController {
 
     UsersVO usersVO = new UsersVO();
     BeanUtils.copyProperties(user, usersVO);
-    usersVO.setUserToken(uniqueToken);
+    usersVO.setUserUniqueToken(uniqueToken);
     return usersVO;
   }
 

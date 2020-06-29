@@ -38,7 +38,7 @@ public class UsersVO {
   /**
    * 用户token
    */
-  private String userToken;
+  private String userUniqueToken;
 
 
   public String getId() {
@@ -89,11 +89,11 @@ public class UsersVO {
     this.sex = sex;
   }
 
-  public String getUserToken() {
-    return userToken;
+  public String getUserUniqueToken() {
+    return userUniqueToken;
   }
 
-  public void setUserToken(String userToken) {
-    this.userToken = userToken;
+  public void setUserUniqueToken(String userUniqueToken) {
+    this.userUniqueToken = userUniqueToken;
   }
 }
