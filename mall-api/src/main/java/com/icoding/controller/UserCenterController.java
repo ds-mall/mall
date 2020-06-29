@@ -159,7 +159,7 @@ public class UserCenterController {
     Users user = usersService.queryUserInfo(userId);
     UsersVO usersVO = new UsersVO();
     BeanUtils.copyProperties(user, usersVO);
-    usersVO.setUserToken(token);
+    usersVO.setUserUniqueToken(token);
     CookieUtils.setCookie(req, rep, "user", JsonUtils.objectToJson(usersVO), true);
   }
 

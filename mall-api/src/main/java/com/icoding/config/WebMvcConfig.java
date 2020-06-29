@@ -36,6 +36,29 @@ public class WebMvcConfig implements WebMvcConfigurer {
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
     registry.addInterceptor(userTokenInterceptor)
-            .addPathPatterns("/user/hello");
+            .addPathPatterns("/shopcart/add")
+            .addPathPatterns("/shopcart/del")
+
+            .addPathPatterns("/address/list")
+            .addPathPatterns("/address/add")
+            .addPathPatterns("/address/update")
+            .addPathPatterns("/address/setDefault")
+            .addPathPatterns("/address/del")
+
+            .addPathPatterns("/orders/getPaidOrderInfo")
+            .addPathPatterns("/orders/items")
+            .addPathPatterns("/orders/receive")
+            .addPathPatterns("/orders/create")
+
+            .addPathPatterns("/comments/list")
+            .addPathPatterns("/comments")
+
+            .addPathPatterns("/center/trend")
+            .addPathPatterns("/center/statusCounts")
+            .addPathPatterns("/center/orders")
+            .addPathPatterns("/center/userface")
+            .addPathPatterns("/center/userInfo")
+
+            .addPathPatterns("/pay/getPaidOrderInfo");
   }
 }
